@@ -1,9 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useAuthStore } from "../../../../../../shared/store";
 import { handleApiError } from "../../../../../../shared/utils";
 import { storefrontQueryKeys } from "../endpoints-keys/storefront.keys";
 import { trackEvent, trackPageview } from "../helpers/storefront-analytics";
+import type { CustomerAddressInput } from "../schema/customer-address-schema";
 import {
   type CheckoutPayment,
   type CheckoutResponse,
@@ -12,6 +15,7 @@ import {
 import { getCartPricesService } from "../services/get-cart-prices.service";
 import { useCartStore } from "../store/cart.store";
 import { useCartSummary } from "./use-cart-summary";
+import { useCustomerAddresses } from "./use-customer-addresses";
 import { useDeliveryForm } from "./use-delivery-form";
 
 export type CartDrawerStep = "cart" | "delivery" | "review";
@@ -23,7 +27,10 @@ const STEP_PATHS: Record<CartDrawerStep, string> = {
 };
 
 export function useCartDrawer() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const session = useAuthStore((state) => state.session);
+  const addressesQuery = useCustomerAddresses(Boolean(session));
   const { items, itemsCount, subtotal } = useCartSummary();
   const setQuantity = useCartStore((state) => state.setQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
@@ -38,8 +45,19 @@ export function useCartDrawer() {
   const [pricesChanged, setPricesChanged] = useState(false);
   const [checkoutPriceChanged, setCheckoutPriceChanged] = useState(false);
 
-  const deliveryForm = useDeliveryForm();
+  const deliveryForm = useDeliveryForm(addressesQuery.addresses, addressesQuery.isLoading);
   const { delivery, isValid: isDeliveryValid } = deliveryForm;
+
+  useEffect(() => {
+    if (
+      isOpen &&
+      session &&
+      sessionStorage.getItem("goldshape-storefront-checkout-step") === "delivery"
+    ) {
+      sessionStorage.removeItem("goldshape-storefront-checkout-step");
+      setStep("delivery");
+    }
+  }, [isOpen, session]);
 
   const originalSubtotal = items.reduce(
     (sum, item) => sum + Math.max(item.originalPrice, item.unitPrice) * item.quantity,
@@ -48,8 +66,8 @@ export function useCartDrawer() {
 
   const discount = Math.max(0, originalSubtotal - subtotal);
 
-  const isFeeToAgree = delivery.isManualArea;
-  const deliveryFee = delivery.area?.fee ?? 0;
+  const isFeeToAgree = false;
+  const deliveryFee = 0;
   const total = subtotal + deliveryFee;
 
   const productNames = useMemo(
@@ -83,6 +101,12 @@ export function useCartDrawer() {
 
   const goToDelivery = () => {
     if (items.length === 0) return;
+    if (!session) {
+      sessionStorage.setItem("goldshape-storefront-checkout-step", "delivery");
+      toast.info("Entre ou crie uma conta para continuar com o pedido.");
+      void navigate("/session?continue=checkout");
+      return;
+    }
     setStep("delivery");
   };
 
@@ -128,7 +152,7 @@ export function useCartDrawer() {
 
   const goToReview = () => {
     if (!isDeliveryValid) {
-      toast.error("Informe um CEP válido, o bairro, a rua e o número para continuar.");
+      toast.error("Selecione ou cadastre um endereço válido para continuar.");
       return;
     }
 
@@ -164,25 +188,18 @@ export function useCartDrawer() {
   const canCheckout = canReview && !isCheckoutLoading && !isRefreshingPrices;
 
   const checkout = async (
-    customerName: string,
     whatsapp: string,
-    email: string,
     paymentMethodId: string,
     isPix: boolean,
     payment: CheckoutPayment,
   ): Promise<CheckoutResponse | null> => {
     if (!canReview) {
-      toast.error("Informe um CEP válido, o bairro, a rua e o número para continuar.");
+      toast.error("Selecione ou cadastre um endereço válido para continuar.");
       return null;
     }
 
-    if (
-      (!delivery.area && !delivery.isManualArea) ||
-      !customerName.trim() ||
-      !whatsapp.trim() ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-    ) {
-      toast.error("Confira seu nome, WhatsApp e e-mail.");
+    if (!delivery.addressId || !whatsapp.trim()) {
+      toast.error("Confira seu WhatsApp e o endereço selecionado.");
       return null;
     }
 
@@ -202,9 +219,7 @@ export function useCartDrawer() {
       const order = await createCheckoutService(
         items,
         delivery,
-        customerName,
         whatsapp,
-        email,
         paymentMethodId,
         payment,
         isPix,
@@ -217,10 +232,7 @@ export function useCartDrawer() {
         discount: isPix ? discount : 0,
         delivery_fee: deliveryFee,
         total: isPix ? total : originalSubtotal + deliveryFee,
-        delivery_area: delivery.isManualArea
-          ? delivery.neighborhood
-          : (delivery.area?.name ?? delivery.neighborhood),
-        is_manual_area: delivery.isManualArea,
+        delivery_address_id: delivery.addressId,
       });
       return order;
     } catch (error) {
@@ -240,13 +252,33 @@ export function useCartDrawer() {
         ]);
         await refreshCartPrices();
       } else {
-        toast.error("Não foi possível processar o pedido. Clique em tentar novamente.");
+        toast.error(apiError.message || "Não foi possível processar o pedido. Tente novamente.");
       }
       setIsCheckoutLoading(false);
       return null;
     } finally {
       setIsCheckoutLoading(false);
     }
+  };
+
+  const saveDeliveryAddress = async () => {
+    const { addressId, isSaved: _isSaved, ...data } = delivery;
+    const input: CustomerAddressInput = {
+      ...data,
+      state: data.state.toUpperCase(),
+    };
+    const address = addressId
+      ? await addressesQuery.updateAddress({ id: addressId, ...input })
+      : await addressesQuery.createAddress(input);
+    deliveryForm.saveAddress(address);
+  };
+
+  const deleteDeliveryAddress = async () => {
+    if (!delivery.addressId) return;
+    const nextAddress =
+      addressesQuery.addresses.find((address) => address.id !== delivery.addressId) ?? null;
+    await addressesQuery.deleteAddress(delivery.addressId);
+    deliveryForm.removeSelectedAddress(nextAddress);
   };
 
   return {
@@ -280,13 +312,24 @@ export function useCartDrawer() {
     checkout,
     deliveryForm: {
       delivery,
+      addresses: addressesQuery.addresses,
+      isAddressListLoading: addressesQuery.isLoading,
+      isAddressListError: addressesQuery.isError,
+      isEditingAddress: deliveryForm.isEditingAddress,
+      isSavingAddress: addressesQuery.isSavingAddress,
+      isDeletingAddress: addressesQuery.isDeletingAddress,
       isSearchingCep: deliveryForm.isSearchingCep,
-      isFeeLoading: deliveryForm.isFeeLoading,
-      isFeeError: deliveryForm.isFeeError,
       cepNotFound: deliveryForm.cepNotFound,
       onChange: deliveryForm.update,
-      onAreaSelect: deliveryForm.selectArea,
-      onManualChange: deliveryForm.setManualArea,
+      onAddressSelect: (addressId: string) => {
+        const address = addressesQuery.addresses.find((item) => item.id === addressId);
+        if (address) deliveryForm.selectAddress(address);
+      },
+      onNewAddress: deliveryForm.startNewAddress,
+      onEditAddress: deliveryForm.editAddress,
+      onCancelAddressEdit: deliveryForm.cancelAddressEdit,
+      onSaveAddress: saveDeliveryAddress,
+      onDeleteAddress: deleteDeliveryAddress,
       onCepChange: deliveryForm.changeCep,
     },
   };

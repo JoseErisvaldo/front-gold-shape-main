@@ -64,6 +64,18 @@ export function OrderRow({ order }: OrderRowProps) {
   ]
     .filter(Boolean)
     .join(" • ");
+  const sellerAddress = [
+    order.sellerStreet
+      ? `${order.sellerStreet}, ${order.sellerNumber ?? ""}${order.sellerComplement ? ` - ${order.sellerComplement}` : ""}`
+      : null,
+    order.sellerNeighborhood,
+    order.sellerCity && order.sellerState
+      ? `${order.sellerCity}/${order.sellerState}`
+      : (order.sellerCity ?? order.sellerState),
+    order.sellerCep ? `CEP ${order.sellerCep}` : null,
+  ]
+    .filter(Boolean)
+    .join(" • ");
 
   return (
     <>
@@ -140,6 +152,7 @@ export function OrderRow({ order }: OrderRowProps) {
                 <Detail label="Cliente" value={order.customerName ?? "—"} />
                 <Detail label="WhatsApp" value={order.whatsapp ?? "—"} />
                 <Detail label="Endereço de entrega" value={address} />
+                <Detail label="Endereço de origem da loja" value={sellerAddress || "—"} />
                 <Detail label="Meio de pagamento" value={order.paymentMethod?.name ?? "—"} />
                 {order.mercadoPagoStatus && (
                   <Detail

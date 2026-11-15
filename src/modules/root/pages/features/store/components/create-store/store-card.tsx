@@ -3,7 +3,21 @@ import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import UpdateRoundedIcon from "@mui/icons-material/UpdateRounded";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import { Box, Chip, Divider, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
+import { useUpdateStoreAddressMutation } from "../../mutations/use-update-store-address-mutation";
 import type { Store } from "../../types/store.types";
 
 type StoreCardProps = {
@@ -31,6 +45,54 @@ function formatDate(date?: string) {
 }
 
 export function StoreCard({ store }: StoreCardProps) {
+  const [isOriginDialogOpen, setIsOriginDialogOpen] = useState(false);
+  const [originAddress, setOriginAddress] = useState({
+    originCep: store.originCep ?? "",
+    originStreet: store.originStreet ?? "",
+    originNumber: store.originNumber ?? "",
+    originComplement: store.originComplement ?? "",
+    originNeighborhood: store.originNeighborhood ?? "",
+    originCity: store.originCity ?? "",
+    originState: store.originState ?? "",
+  });
+  const updateOriginAddress = useUpdateStoreAddressMutation(store.id);
+
+  const openOriginDialog = () => {
+    setOriginAddress({
+      originCep: store.originCep ?? "",
+      originStreet: store.originStreet ?? "",
+      originNumber: store.originNumber ?? "",
+      originComplement: store.originComplement ?? "",
+      originNeighborhood: store.originNeighborhood ?? "",
+      originCity: store.originCity ?? "",
+      originState: store.originState ?? "",
+    });
+    setIsOriginDialogOpen(true);
+  };
+
+  const saveOriginAddress = async () => {
+    try {
+      await updateOriginAddress.mutateAsync({
+        ...originAddress,
+        originState: originAddress.originState.toUpperCase(),
+      });
+      setIsOriginDialogOpen(false);
+    } catch {
+      return;
+    }
+  };
+
+  const originAddressLabel = [
+    store.originStreet,
+    store.originNumber,
+    store.originComplement,
+    store.originNeighborhood,
+    [store.originCity, store.originState].filter(Boolean).join("/"),
+    store.originCep ? `CEP ${store.originCep}` : "",
+  ]
+    .filter(Boolean)
+    .join(" — ");
+
   return (
     <Paper
       elevation={0}
@@ -139,6 +201,11 @@ export function StoreCard({ store }: StoreCardProps) {
             label="WhatsApp"
             value={store.whatsapp || "Não informado"}
           />
+          <InfoItem
+            icon={<StorefrontRoundedIcon />}
+            label="Endereço de origem"
+            value={originAddressLabel || "Não informado"}
+          />
 
           <InfoItem
             icon={<UpdateRoundedIcon />}
@@ -146,6 +213,9 @@ export function StoreCard({ store }: StoreCardProps) {
             value={store.active ? "Ativa e disponível" : "Inativa"}
           />
         </Box>
+        <Button variant="outlined" onClick={openOriginDialog} sx={{ mt: 2, textTransform: "none" }}>
+          Configurar endereço de origem
+        </Button>
 
         <Divider sx={{ my: 3.5 }} />
 
@@ -176,6 +246,109 @@ export function StoreCard({ store }: StoreCardProps) {
           />
         </Box>
       </Box>
+
+      <Dialog
+        open={isOriginDialogOpen}
+        onClose={() => setIsOriginDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Endereço de origem da loja</DialogTitle>
+        <DialogContent sx={{ display: "grid", gap: 2, pt: "12px !important" }}>
+          <Typography sx={{ color: "#6b7280", fontSize: 13 }}>
+            Esse endereço ficará registrado como origem da loja nos novos pedidos.
+          </Typography>
+          <TextField
+            required
+            label="CEP"
+            value={originAddress.originCep}
+            onChange={(event) =>
+              setOriginAddress((current) => ({ ...current, originCep: event.target.value }))
+            }
+          />
+          <TextField
+            required
+            label="Rua / avenida"
+            value={originAddress.originStreet}
+            onChange={(event) =>
+              setOriginAddress((current) => ({ ...current, originStreet: event.target.value }))
+            }
+          />
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 2 }}>
+            <TextField
+              required
+              label="Número"
+              value={originAddress.originNumber}
+              onChange={(event) =>
+                setOriginAddress((current) => ({ ...current, originNumber: event.target.value }))
+              }
+            />
+            <TextField
+              label="Complemento"
+              value={originAddress.originComplement}
+              onChange={(event) =>
+                setOriginAddress((current) => ({
+                  ...current,
+                  originComplement: event.target.value,
+                }))
+              }
+            />
+          </Box>
+          <TextField
+            required
+            label="Bairro"
+            value={originAddress.originNeighborhood}
+            onChange={(event) =>
+              setOriginAddress((current) => ({
+                ...current,
+                originNeighborhood: event.target.value,
+              }))
+            }
+          />
+          <Box sx={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 2 }}>
+            <TextField
+              required
+              label="Cidade"
+              value={originAddress.originCity}
+              onChange={(event) =>
+                setOriginAddress((current) => ({ ...current, originCity: event.target.value }))
+              }
+            />
+            <TextField
+              required
+              label="UF"
+              value={originAddress.originState}
+              onChange={(event) =>
+                setOriginAddress((current) => ({
+                  ...current,
+                  originState: event.target.value.toUpperCase().slice(0, 2),
+                }))
+              }
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button onClick={() => setIsOriginDialogOpen(false)} sx={{ textTransform: "none" }}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => void saveOriginAddress()}
+            disabled={
+              !originAddress.originCep.trim() ||
+              !originAddress.originStreet.trim() ||
+              !originAddress.originNumber.trim() ||
+              !originAddress.originNeighborhood.trim() ||
+              !originAddress.originCity.trim() ||
+              originAddress.originState.trim().length !== 2 ||
+              updateOriginAddress.isPending
+            }
+            sx={{ textTransform: "none" }}
+          >
+            {updateOriginAddress.isPending ? "Salvando..." : "Salvar endereço"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 }

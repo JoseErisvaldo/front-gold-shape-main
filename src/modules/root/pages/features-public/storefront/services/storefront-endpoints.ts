@@ -3,10 +3,9 @@ export const storefrontEndpoints = {
   product: (productId: string) => `/public/products/${productId}`,
   categories: "/public/categories",
   store: "/public/store",
-  deliveryAreas: "/public/delivery-areas",
-  deliveryArea: (areaId: string) => `/public/delivery-areas/${areaId}`,
-  checkout: "/public/checkout",
-  checkoutStatus: (orderNsu: string) => `/public/checkout/${encodeURIComponent(orderNsu)}`,
+  checkout: "/checkout",
+  checkoutStatus: (orderNsu: string) => `/checkout/${encodeURIComponent(orderNsu)}`,
   cartPrices: "/public/cart-prices",
   paymentMethods: "/public/payment-methods",
+  customerAddresses: "/me/addresses",
 } as const;

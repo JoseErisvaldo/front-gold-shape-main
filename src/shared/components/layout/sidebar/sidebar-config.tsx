@@ -60,11 +60,6 @@ export const GoldShape_SIDEBAR_CONFIG: AppSidebarConfig = {
       icon: <PaymentIcon fontSize="small" />,
     },
     {
-      label: "Áreas de entrega",
-      to: "/delivery-areas",
-      icon: <StoreIcon fontSize="small" />,
-    },
-    {
       label: "Usuários",
       to: "/list-users",
       icon: <Profiles fontSize="small" />,

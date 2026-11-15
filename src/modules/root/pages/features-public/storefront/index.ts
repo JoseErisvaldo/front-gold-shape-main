@@ -4,7 +4,6 @@ export type {
   CartItem,
   DeliveryInfo,
   PublicCategory,
-  PublicDeliveryArea,
   PublicProduct,
   PublicStore,
 } from "./types/storefront.types";

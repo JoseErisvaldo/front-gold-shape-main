@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { queryClient } from "../../../../../../../shared/services/queries";
 import { useAuthStore } from "../../../../../../../shared/store";
@@ -27,6 +27,12 @@ export function StorefrontLayout({
   const clearSession = useAuthStore((state) => state.clearSession);
   const { storeName, isStoreLoading, whatsappUrl, itemsCount, isCartOpen, openCart, closeCart } =
     useStorefrontLayout();
+
+  useEffect(() => {
+    if (session && sessionStorage.getItem("goldshape-storefront-checkout-step") === "delivery") {
+      openCart();
+    }
+  }, [openCart, session]);
 
   const handleLogout = () => {
     clearSession();

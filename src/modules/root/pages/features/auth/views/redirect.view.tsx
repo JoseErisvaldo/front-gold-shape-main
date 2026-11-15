@@ -8,5 +8,8 @@ function isAdminRole(role: unknown) {
 export function RedirectView() {
   const session = useAuthStore((state) => state.session);
   if (!session) return <Navigate to="/session" replace />;
+  if (sessionStorage.getItem("goldshape-storefront-checkout-step") === "delivery") {
+    return <Navigate to="/" replace />;
+  }
   return <Navigate to={isAdminRole(session.role) ? "/home" : "/"} replace />;
 }

@@ -13,7 +13,7 @@ export type DashboardStat = {
 };
 
 export type DashboardSection = {
-  id: "catalog" | "delivery" | "access";
+  id: "catalog" | "access";
   title: string;
   stats: DashboardStat[];
 };
@@ -61,24 +61,6 @@ export function buildDashboardSections(totals: DashboardTotals): DashboardSectio
           id: "categories",
           label: "Categorias",
           value: totals.categories,
-          tone: "neutral",
-        },
-      ],
-    },
-    {
-      id: "delivery",
-      title: "Entrega",
-      stats: [
-        {
-          id: "deliveryAreas",
-          label: "Áreas de entrega",
-          value: totals.deliveryAreas,
-          tone: "green",
-        },
-        {
-          id: "neighborhoods",
-          label: "Bairros",
-          value: totals.neighborhoods,
           tone: "neutral",
         },
       ],

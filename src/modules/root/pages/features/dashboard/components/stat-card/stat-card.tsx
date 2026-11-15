@@ -3,8 +3,6 @@ import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
 import LocalOfferRoundedIcon from "@mui/icons-material/LocalOfferRounded";
-import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
-import PlaceRoundedIcon from "@mui/icons-material/PlaceRounded";
 import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
 import { Box, Paper, Typography } from "@mui/material";
 import type { ReactNode } from "react";
@@ -21,8 +19,6 @@ const STAT_ICONS: Record<StatId, ReactNode> = {
   inactiveProducts: <VisibilityOffRoundedIcon fontSize="small" />,
   categories: <CategoryRoundedIcon fontSize="small" />,
   users: <GroupRoundedIcon fontSize="small" />,
-  deliveryAreas: <LocalShippingRoundedIcon fontSize="small" />,
-  neighborhoods: <PlaceRoundedIcon fontSize="small" />,
 };
 
 const TONES: Record<StatTone, { color: string; bgcolor: string }> = {

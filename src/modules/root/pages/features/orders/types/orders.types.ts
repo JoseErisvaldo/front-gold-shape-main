@@ -23,6 +23,13 @@ export const orderSchema = z.object({
   city: z.string(),
   state: z.string(),
   complement: z.string().nullable(),
+  sellerCep: z.string().nullable().optional(),
+  sellerStreet: z.string().nullable().optional(),
+  sellerNumber: z.string().nullable().optional(),
+  sellerComplement: z.string().nullable().optional(),
+  sellerNeighborhood: z.string().nullable().optional(),
+  sellerCity: z.string().nullable().optional(),
+  sellerState: z.string().nullable().optional(),
   paidAt: z.string().nullable(),
   createdAt: z.string(),
   items: z.array(

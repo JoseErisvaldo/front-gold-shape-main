@@ -1,53 +1,96 @@
-import { useRef, useState } from "react";
-import { usePublicDeliveryAreaQuery } from "../queries/use-public-delivery-area-query";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { CustomerAddress } from "../schema/customer-address-schema";
 import { fetchCep, formatCep } from "../services/fetch-cep";
-import type { DeliveryInfo, PublicDeliveryArea } from "../types/storefront.types";
+import type { DeliveryInfo } from "../types/storefront.types";
 
 const EMPTY: DeliveryInfo = {
-  area: null,
-  isManualArea: false,
-  neighborhood: "",
+  addressId: null,
+  isSaved: false,
+  label: "",
   cep: "",
   street: "",
   number: "",
   complement: "",
+  neighborhood: "",
   city: "",
   state: "",
 };
 
-export function useDeliveryForm() {
-  const [selected, setSelected] = useState<DeliveryInfo>(EMPTY);
+function toDeliveryInfo(address: CustomerAddress): DeliveryInfo {
+  return {
+    addressId: address.id,
+    isSaved: true,
+    label: address.label,
+    cep: address.cep,
+    street: address.street,
+    number: address.number,
+    complement: address.complement ?? "",
+    neighborhood: address.neighborhood,
+    city: address.city,
+    state: address.state,
+  };
+}
+
+export function useDeliveryForm(addresses: CustomerAddress[], isAddressListLoading: boolean) {
+  const [delivery, setDelivery] = useState<DeliveryInfo>(EMPTY);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [isSearchingCep, setIsSearchingCep] = useState(false);
   const [cepNotFound, setCepNotFound] = useState(false);
   const cepLookupId = useRef(0);
 
-  const areaQuery = usePublicDeliveryAreaQuery(selected.area?.id ?? null);
-  const area = areaQuery.data ?? selected.area;
-  const isFeeLoading = Boolean(selected.area) && !areaQuery.data && !areaQuery.isError;
-  const isFeeError = Boolean(selected.area) && areaQuery.isError;
+  const selectAddress = useCallback((address: CustomerAddress | null) => {
+    setDelivery(address ? toDeliveryInfo(address) : EMPTY);
+    setIsEditingAddress(false);
+    setCepNotFound(false);
+  }, []);
 
-  const delivery: DeliveryInfo = { ...selected, area };
+  useEffect(() => {
+    if (isEditingAddress || isAddressListLoading) return;
+    const selected = addresses.find((address) => address.id === delivery.addressId);
+    if (selected && delivery.isSaved) return;
+    if (addresses.length > 0) {
+      selectAddress(addresses[0]);
+    } else {
+      setDelivery(EMPTY);
+      setIsEditingAddress(true);
+    }
+  }, [
+    addresses,
+    delivery.addressId,
+    delivery.isSaved,
+    isAddressListLoading,
+    isEditingAddress,
+    selectAddress,
+  ]);
 
   const update = (patch: Partial<DeliveryInfo>) =>
-    setSelected((current) => ({ ...current, ...patch }));
+    setDelivery((current) => ({ ...current, ...patch, isSaved: false }));
 
-  const selectArea = (next: PublicDeliveryArea | null) =>
-    update({
-      area: next,
-      isManualArea: false,
-      neighborhood: next?.name ?? "",
-      city: next?.city ?? "",
-      state: next?.state ?? "",
-    });
+  const startNewAddress = () => {
+    setDelivery(EMPTY);
+    setIsEditingAddress(true);
+    setCepNotFound(false);
+  };
 
-  const setManualArea = (manual: boolean) =>
-    update({
-      isManualArea: manual,
-      area: null,
-      neighborhood: "",
-      city: selected.area?.city ?? selected.city,
-      state: selected.area?.state ?? selected.state,
-    });
+  const editAddress = () => setIsEditingAddress(true);
+
+  const cancelAddressEdit = () => {
+    const saved = addresses.find((address) => address.id === delivery.addressId);
+    if (saved) {
+      selectAddress(saved);
+    } else if (addresses.length > 0) {
+      selectAddress(addresses[0]);
+    } else {
+      startNewAddress();
+    }
+  };
+
+  const saveAddress = (address: CustomerAddress) => selectAddress(address);
+
+  const removeSelectedAddress = (nextAddress: CustomerAddress | null) => {
+    selectAddress(nextAddress);
+    if (!nextAddress) setIsEditingAddress(true);
+  };
 
   const changeCep = async (value: string) => {
     const cep = formatCep(value);
@@ -68,51 +111,42 @@ export function useDeliveryForm() {
         return;
       }
 
-      update({ street: found.street, city: found.city, state: found.state });
-      setSelected((current) =>
-        current.isManualArea && !current.neighborhood
-          ? { ...current, neighborhood: found.neighborhood }
-          : current,
-      );
+      update({
+        street: found.street,
+        neighborhood: found.neighborhood,
+        city: found.city,
+        state: found.state,
+      });
     } catch {
       if (lookupId === cepLookupId.current) setCepNotFound(true);
     } finally {
-      if (lookupId === cepLookupId.current) {
-        setIsSearchingCep(false);
-      }
+      if (lookupId === cepLookupId.current) setIsSearchingCep(false);
     }
   };
 
-  const hasNeighborhood = delivery.isManualArea
-    ? delivery.neighborhood.trim() !== "" &&
-      delivery.city.trim() !== "" &&
-      delivery.state.trim().length === 2
-    : Boolean(areaQuery.data);
-
   const isValid =
+    Boolean(delivery.addressId) &&
+    delivery.isSaved &&
     delivery.cep.replace(/\D/g, "").length === 8 &&
-    hasNeighborhood &&
     delivery.street.trim() !== "" &&
-    delivery.number.trim() !== "";
-
-  const reset = () => {
-    cepLookupId.current += 1;
-    setSelected(EMPTY);
-    setCepNotFound(false);
-    setIsSearchingCep(false);
-  };
+    delivery.number.trim() !== "" &&
+    delivery.neighborhood.trim() !== "" &&
+    delivery.city.trim() !== "" &&
+    delivery.state.trim().length === 2;
 
   return {
     delivery,
     update,
-    selectArea,
-    setManualArea,
+    selectAddress,
+    startNewAddress,
+    editAddress,
+    cancelAddressEdit,
+    saveAddress,
+    removeSelectedAddress,
     changeCep,
+    isEditingAddress,
     isSearchingCep,
-    isFeeLoading,
-    isFeeError,
     cepNotFound,
     isValid,
-    reset,
   };
 }

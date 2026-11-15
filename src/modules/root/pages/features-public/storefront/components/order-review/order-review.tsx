@@ -81,11 +81,8 @@ export function OrderReview({
   customerName,
   customerWhatsapp,
 }: OrderReviewProps) {
-  const area = delivery.area;
-  const neighborhood = delivery.isManualArea ? delivery.neighborhood : (area?.name ?? "");
-  const cityState = delivery.isManualArea
-    ? [delivery.city, delivery.state].filter(Boolean).join("/")
-    : [area?.city, area?.state].filter(Boolean).join("/");
+  const neighborhood = delivery.neighborhood;
+  const cityState = [delivery.city, delivery.state].filter(Boolean).join("/");
 
   const deliveryLabel = isFeeToAgree
     ? "A combinar"

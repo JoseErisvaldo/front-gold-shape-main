@@ -25,6 +25,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { type ComponentProps, useEffect, useRef, useState } from "react";
 import { apiClient } from "../../../../../../../shared/services/api-client";
+import { useAuthStore } from "../../../../../../../shared/store";
 import { logError } from "../../../../../../../shared/utils";
 import { formatPrice } from "../../helpers/format-price";
 import { isValidBrazilianDocument } from "../../helpers/is-valid-brazilian-document";
@@ -88,14 +89,15 @@ function getCardPaymentMethodId(
 }
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
-  const [customerName, setCustomerName] = useState("");
   const [customerWhatsapp, setCustomerWhatsapp] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
   const [cardSubmissionError, setCardSubmissionError] = useState<string | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<{ id: string; name: string }[]>([]);
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [checkoutResult, setCheckoutResult] = useState<CheckoutResponse | null>(null);
+  const session = useAuthStore((state) => state.session);
+  const customerName = typeof session?.name === "string" ? session.name : "";
+  const customerEmail = typeof session?.email === "string" ? session.email : "";
   useEffect(() => {
     apiClient
       .get("/public/payment-methods")
@@ -200,14 +202,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   };
 
   const submitPixPayment = async () => {
-    const result = await checkout(
-      customerName,
-      customerWhatsapp,
-      customerEmail,
-      paymentMethodId,
-      true,
-      { type: "pix" },
-    );
+    const result = await checkout(customerWhatsapp, paymentMethodId, true, { type: "pix" });
     if (result) {
       clearedOrderNsu.current = null;
       setCheckoutResult(result);
@@ -259,14 +254,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             }
           : {}),
       };
-      const result = await checkout(
-        customerName,
-        customerWhatsapp,
-        customerEmail,
-        cardPaymentMethodId,
-        false,
-        payment,
-      );
+      const result = await checkout(customerWhatsapp, cardPaymentMethodId, false, payment);
       if (!result) throw new Error("Não foi possível iniciar o pagamento.");
       clearedOrderNsu.current = null;
       setCheckoutResult(result);
@@ -446,12 +434,11 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                   </Typography>
                   <Box sx={{ display: "grid", gap: 1.5, mb: 2 }}>
                     <TextField
-                      required
                       fullWidth
                       type="email"
-                      label="E-mail para o pagamento"
+                      label="E-mail da conta"
                       value={customerEmail}
-                      onChange={(event) => setCustomerEmail(event.target.value)}
+                      disabled
                       autoComplete="email"
                     />
                     <TextField
@@ -526,7 +513,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                   {...deliveryForm}
                   customerName={customerName}
                   customerWhatsapp={customerWhatsapp}
-                  onCustomerNameChange={setCustomerName}
                   onCustomerWhatsappChange={setCustomerWhatsapp}
                 />
               ) : (

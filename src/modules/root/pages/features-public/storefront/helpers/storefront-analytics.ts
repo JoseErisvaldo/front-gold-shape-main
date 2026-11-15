@@ -60,8 +60,7 @@ type StorefrontEvents = {
     discount: number;
     delivery_fee: number | null;
     total: number;
-    delivery_area: string;
-    is_manual_area: boolean;
+    delivery_address_id: string;
   };
   // Cliente passou o banner manualmente (autoplay não é registrado).
   banner_slide_changed: {

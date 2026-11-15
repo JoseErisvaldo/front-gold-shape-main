@@ -4,7 +4,6 @@ import { LoginView, RegisterView } from "./modules/root/pages/features/auth";
 import { RedirectView } from "./modules/root/pages/features/auth/views/redirect.view";
 import { CategoriesView } from "./modules/root/pages/features/categories";
 import { DashboardView } from "./modules/root/pages/features/dashboard";
-import { DeliveryAreasListView } from "./modules/root/pages/features/delivery-areas";
 import { HomeView } from "./modules/root/pages/features/home";
 import { ListUsersView } from "./modules/root/pages/features/list-users";
 import { NotFoundView } from "./modules/root/pages/features/not-found";
@@ -77,7 +76,6 @@ function App() {
             <Route path="/products/create" element={<CreateProductView />} />
             <Route path="/orders" element={<OrdersView />} />
             <Route path="/payment-methods" element={<PaymentMethodsView />} />
-            <Route path="/delivery-areas" element={<DeliveryAreasListView />} />
             <Route path="/list-users" element={<ListUsersView />} />
             <Route path="/profile" element={<ProfileView />} />
           </Route>

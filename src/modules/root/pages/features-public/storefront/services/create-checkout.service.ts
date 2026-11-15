@@ -67,15 +67,13 @@ export type CheckoutStatus = z.infer<typeof checkoutStatusSchema>;
 export async function createCheckoutService(
   items: CartItem[],
   delivery: DeliveryInfo,
-  customerName: string,
   whatsapp: string,
-  email: string,
   paymentMethodId: string,
   payment: CheckoutPayment,
   isPix: boolean,
 ): Promise<CheckoutResponse> {
-  if (!delivery.area && !delivery.isManualArea) {
-    throw new Error("Escolha uma área de entrega para continuar.");
+  if (!delivery.addressId) {
+    throw new Error("Selecione um endereço de entrega para continuar.");
   }
 
   try {
@@ -85,22 +83,10 @@ export async function createCheckoutService(
         quantity: item.quantity,
         expectedUnitPriceCents: Math.round((isPix ? item.unitPrice : item.originalPrice) * 100),
       })),
-      ...(delivery.area ? { deliveryAreaId: delivery.area.id } : {}),
-      deliveryFeePending: delivery.isManualArea,
-      customerName,
+      customerAddressId: delivery.addressId,
       whatsapp,
-      email,
       paymentMethodId,
       payment,
-      address: {
-        cep: delivery.cep,
-        street: delivery.street,
-        number: delivery.number,
-        neighborhood: delivery.isManualArea ? delivery.neighborhood : (delivery.area?.name ?? ""),
-        city: delivery.isManualArea ? delivery.city : (delivery.area?.city ?? ""),
-        state: delivery.isManualArea ? delivery.state : (delivery.area?.state ?? ""),
-        complement: delivery.complement || undefined,
-      },
     });
 
     return checkoutResponseSchema.parse(data);

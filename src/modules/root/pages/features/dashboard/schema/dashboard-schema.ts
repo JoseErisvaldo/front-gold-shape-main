@@ -9,8 +9,6 @@ const totalsSchema = z.object({
   inactiveProducts: count,
   categories: count,
   users: count,
-  deliveryAreas: count,
-  neighborhoods: count,
 });
 
 // GET /dashboard -> { data: { totals: {...} } }; aqui vira só os totais.

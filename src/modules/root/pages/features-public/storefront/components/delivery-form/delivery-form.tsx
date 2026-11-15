@@ -1,33 +1,44 @@
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
 import {
   Alert,
-  Autocomplete,
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { formatPhoneNumber } from "../../../../../../../shared/utils";
-import { formatPrice } from "../../helpers/format-price";
-import { usePublicDeliveryAreasQuery } from "../../queries/use-public-delivery-areas-query";
-import type { DeliveryInfo, PublicDeliveryArea } from "../../types/storefront.types";
+import type { CustomerAddress } from "../../schema/customer-address-schema";
+import type { DeliveryInfo } from "../../types/storefront.types";
 
 type DeliveryFormProps = {
+  addresses: CustomerAddress[];
   delivery: DeliveryInfo;
+  isAddressListLoading: boolean;
+  isAddressListError: boolean;
+  isEditingAddress: boolean;
+  isSavingAddress: boolean;
+  isDeletingAddress: boolean;
   isSearchingCep: boolean;
-  isFeeLoading: boolean;
-  isFeeError: boolean;
   cepNotFound: boolean;
   customerName: string;
   customerWhatsapp: string;
-  onCustomerNameChange: (value: string) => void;
   onCustomerWhatsappChange: (value: string) => void;
+  onAddressSelect: (id: string) => void;
+  onNewAddress: () => void;
+  onEditAddress: () => void;
+  onCancelAddressEdit: () => void;
+  onSaveAddress: () => Promise<void>;
+  onDeleteAddress: () => Promise<void>;
   onChange: (patch: Partial<DeliveryInfo>) => void;
-  onAreaSelect: (area: PublicDeliveryArea | null) => void;
-  onManualChange: (manual: boolean) => void;
   onCepChange: (cep: string) => void;
 };
 
@@ -35,49 +46,58 @@ const fieldSx = {
   "& .MuiOutlinedInput-root": { borderRadius: "10px", bgcolor: "#FFFFFF" },
 };
 
-const linkButtonSx = {
-  alignSelf: "flex-start",
-  minHeight: 0,
-  p: 0,
-  color: "#16A34A",
-  fontSize: 13,
-  fontWeight: 700,
-  textTransform: "none",
-  "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
-} as const;
-
-const formatLocation = (area: PublicDeliveryArea) =>
-  [area.city, area.state].filter(Boolean).join("/");
-
 export function DeliveryForm({
+  addresses,
   delivery,
+  isAddressListLoading,
+  isAddressListError,
+  isEditingAddress,
+  isSavingAddress,
+  isDeletingAddress,
   isSearchingCep,
-  isFeeLoading,
-  isFeeError,
   cepNotFound,
   customerName,
   customerWhatsapp,
-  onCustomerNameChange,
   onCustomerWhatsappChange,
+  onAddressSelect,
+  onNewAddress,
+  onEditAddress,
+  onCancelAddressEdit,
+  onSaveAddress,
+  onDeleteAddress,
   onChange,
-  onAreaSelect,
-  onManualChange,
   onCepChange,
 }: DeliveryFormProps) {
-  const [search, setSearch] = useState("");
-  const { data: areas = [], isFetching } = usePublicDeliveryAreasQuery(search);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const handleSave = () => void onSaveAddress().catch(() => undefined);
+  const handleDelete = async () => {
+    try {
+      await onDeleteAddress();
+      setIsDeleteDialogOpen(false);
+    } catch {
+      return;
+    }
+  };
+
+  const addressIsComplete =
+    delivery.label.trim() !== "" &&
+    delivery.cep.replace(/\D/g, "").length === 8 &&
+    delivery.street.trim() !== "" &&
+    delivery.number.trim() !== "" &&
+    delivery.neighborhood.trim() !== "" &&
+    delivery.city.trim() !== "" &&
+    delivery.state.trim().length === 2;
 
   return (
     <Stack spacing={2}>
-      <Box sx={{ display: "grid", gap: 2 }}>
+      <Box sx={{ display: "grid", gap: 1.5 }}>
         <Typography sx={{ color: "#292D45", fontSize: 15, fontWeight: 700 }}>Seus dados</Typography>
         <TextField
-          required
           label="Nome"
-          autoComplete="name"
           value={customerName}
-          onChange={(event) => onCustomerNameChange(event.target.value)}
+          disabled
           sx={fieldSx}
+          helperText="Nome e e-mail vinculados à sua conta."
         />
         <TextField
           required
@@ -96,162 +116,218 @@ export function DeliveryForm({
         <Typography sx={{ color: "#292D45", fontSize: 15, fontWeight: 700 }}>Entrega</Typography>
       </Box>
 
-      {delivery.isManualArea ? (
-        <>
+      <Alert severity="success" sx={{ borderRadius: "10px" }}>
+        Frete grátis por enquanto.
+      </Alert>
+
+      {isAddressListError && (
+        <Alert severity="error">
+          Não foi possível carregar seus endereços. Atualize a página e tente novamente.
+        </Alert>
+      )}
+
+      {isAddressListLoading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+          <CircularProgress size={24} />
+        </Box>
+      ) : (
+        addresses.length > 0 && (
+          <TextField
+            select
+            required
+            label="Endereço salvo"
+            value={delivery.addressId ?? ""}
+            onChange={(event) => onAddressSelect(event.target.value)}
+            sx={fieldSx}
+          >
+            {addresses.map((address) => (
+              <MenuItem key={address.id} value={address.id}>
+                {address.label} — {address.street}, {address.number}, {address.city}
+              </MenuItem>
+            ))}
+          </TextField>
+        )
+      )}
+
+      {isEditingAddress ? (
+        <Stack spacing={2}>
+          <Typography sx={{ color: "#292D45", fontSize: 14, fontWeight: 700 }}>
+            {delivery.addressId ? "Editar endereço" : "Novo endereço"}
+          </Typography>
           <TextField
             required
-            label="Nome do bairro"
+            label="Nome do endereço"
+            placeholder="Casa, trabalho..."
+            value={delivery.label}
+            onChange={(event) => onChange({ label: event.target.value })}
+            sx={fieldSx}
+          />
+          <TextField
+            required
+            label="CEP"
+            placeholder="00000-000"
+            value={delivery.cep}
+            onChange={(event) => onCepChange(event.target.value)}
+            error={delivery.cep !== "" && delivery.cep.replace(/\D/g, "").length !== 8}
+            helperText={
+              delivery.cep !== "" && delivery.cep.replace(/\D/g, "").length !== 8
+                ? "Informe um CEP com 8 números."
+                : "O CEP pode preencher automaticamente os dados do endereço."
+            }
+            sx={fieldSx}
+            slotProps={{
+              htmlInput: { inputMode: "numeric", maxLength: 9, required: true },
+              input: {
+                endAdornment: isSearchingCep ? <CircularProgress size={16} /> : undefined,
+              },
+            }}
+          />
+
+          {cepNotFound && (
+            <Alert severity="info" sx={{ borderRadius: "10px" }}>
+              CEP não localizado. Preencha o endereço manualmente.
+            </Alert>
+          )}
+
+          <TextField
+            required
+            label="Rua / avenida"
+            value={delivery.street}
+            onChange={(event) => onChange({ street: event.target.value })}
+            sx={fieldSx}
+          />
+          <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "1fr 2fr" }}>
+            <TextField
+              required
+              label="Número"
+              value={delivery.number}
+              onChange={(event) => onChange({ number: event.target.value })}
+              sx={fieldSx}
+            />
+            <TextField
+              label="Complemento"
+              value={delivery.complement}
+              onChange={(event) => onChange({ complement: event.target.value })}
+              sx={fieldSx}
+            />
+          </Box>
+          <TextField
+            required
+            label="Bairro"
             value={delivery.neighborhood}
             onChange={(event) => onChange({ neighborhood: event.target.value })}
             sx={fieldSx}
           />
-          <TextField
-            required
-            label="Cidade"
-            value={delivery.city}
-            onChange={(event) => onChange({ city: event.target.value })}
-            sx={fieldSx}
-          />
-          <TextField
-            required
-            label="Estado (UF)"
-            value={delivery.state}
-            onChange={(event) => onChange({ state: event.target.value.toUpperCase().slice(0, 2) })}
-            sx={fieldSx}
-          />
-          <Alert severity="info" sx={{ borderRadius: "10px" }}>
-            O valor da entrega para este bairro será combinado com a loja pelo WhatsApp.
-          </Alert>
-          <Button disableRipple sx={linkButtonSx} onClick={() => onManualChange(false)}>
-            Escolher um bairro da lista
-          </Button>
-        </>
+          <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "2fr 1fr" }}>
+            <TextField
+              required
+              label="Cidade"
+              value={delivery.city}
+              onChange={(event) => onChange({ city: event.target.value })}
+              sx={fieldSx}
+            />
+            <TextField
+              required
+              label="UF"
+              value={delivery.state}
+              onChange={(event) =>
+                onChange({ state: event.target.value.toUpperCase().slice(0, 2) })
+              }
+              sx={fieldSx}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            <Button
+              variant="contained"
+              onClick={handleSave}
+              disabled={!addressIsComplete || isSearchingCep || isSavingAddress}
+              sx={{ textTransform: "none" }}
+            >
+              {isSavingAddress ? "Salvando..." : "Salvar endereço"}
+            </Button>
+            {delivery.addressId && (
+              <Button
+                onClick={onCancelAddressEdit}
+                disabled={isSavingAddress}
+                sx={{ textTransform: "none" }}
+              >
+                Cancelar
+              </Button>
+            )}
+          </Box>
+        </Stack>
       ) : (
-        <>
-          <Autocomplete
-            options={areas}
-            value={delivery.area}
-            loading={isFetching}
-            filterOptions={(options) => options}
-            getOptionLabel={(area) => area.name}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            onChange={(_, area) => onAreaSelect(area)}
-            onInputChange={(_, value, reason) => reason === "input" && setSearch(value)}
-            noOptionsText="Nenhum bairro encontrado. Use a opção abaixo."
-            loadingText="Buscando bairros..."
-            renderOption={(props, area) => (
-              <Box component="li" {...props} key={area.id}>
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography sx={{ color: "#292D45", fontSize: 14 }}>{area.name}</Typography>
-                  {formatLocation(area) && (
-                    <Typography sx={{ color: "#858A9D", fontSize: 12 }}>
-                      {formatLocation(area)}
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                required
-                label="Bairro de entrega"
-                placeholder="Digite para pesquisar"
-                sx={fieldSx}
-                slotProps={{
-                  ...params.slotProps,
-                  input: {
-                    ...params.slotProps.input,
-                    endAdornment: (
-                      <>
-                        {isFetching && <CircularProgress size={16} />}
-                        {params.slotProps.input?.endAdornment}
-                      </>
-                    ),
-                  },
-                }}
-              />
-            )}
-          />
-
-          {delivery.area && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {isFeeError ? (
-                <Typography sx={{ color: "#B42318", fontSize: 13, fontWeight: 700 }}>
-                  Não foi possível calcular a taxa. Escolha o bairro novamente.
-                </Typography>
-              ) : isFeeLoading || delivery.area.fee === null ? (
-                <>
-                  <Typography sx={{ color: "#858A9D", fontSize: 13, fontWeight: 700 }}>
-                    Calculando taxa de entrega...
-                  </Typography>
-                  <CircularProgress size={14} />
-                </>
-              ) : (
-                <Typography sx={{ color: "#15803D", fontSize: 13, fontWeight: 700 }}>
-                  Taxa de entrega:{" "}
-                  {delivery.area.fee > 0 ? formatPrice(delivery.area.fee) : "Grátis"}
-                </Typography>
-              )}
+        <Box sx={{ display: "grid", gap: 1.5 }}>
+          {delivery.addressId && (
+            <Box
+              sx={{
+                display: "grid",
+                gap: 0.25,
+                p: 1.75,
+                border: "1px solid #DFE2EC",
+                borderRadius: "10px",
+                bgcolor: "#FFFFFF",
+              }}
+            >
+              <Typography sx={{ color: "#292D45", fontSize: 14, fontWeight: 700 }}>
+                {delivery.label}
+              </Typography>
+              <Typography sx={{ color: "#5A5F73", fontSize: 13 }}>
+                {delivery.street}, {delivery.number}
+                {delivery.complement ? ` — ${delivery.complement}` : ""}
+              </Typography>
+              <Typography sx={{ color: "#5A5F73", fontSize: 13 }}>
+                {delivery.neighborhood} — {delivery.city}/{delivery.state}
+              </Typography>
+              <Typography sx={{ color: "#858A9D", fontSize: 12 }}>CEP: {delivery.cep}</Typography>
             </Box>
           )}
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            {delivery.addressId && (
+              <>
+                <Button onClick={onEditAddress} sx={{ textTransform: "none" }}>
+                  Editar endereço
+                </Button>
+                <Button
+                  color="error"
+                  startIcon={<DeleteOutlineRoundedIcon />}
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  disabled={isDeletingAddress}
+                  sx={{ textTransform: "none" }}
+                >
+                  Excluir
+                </Button>
+              </>
+            )}
+            <Button onClick={onNewAddress} sx={{ textTransform: "none" }}>
+              Cadastrar outro endereço
+            </Button>
+          </Box>
+        </Box>
+      )}
 
-          <Button disableRipple sx={linkButtonSx} onClick={() => onManualChange(true)}>
-            Não encontrei meu bairro
+      <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
+        <DialogTitle>Excluir endereço?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            O endereço será removido da sua lista. Pedidos anteriores continuarão com os dados
+            registrados no momento da compra.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsDeleteDialogOpen(false)} sx={{ textTransform: "none" }}>
+            Cancelar
           </Button>
-        </>
-      )}
-
-      <TextField
-        required
-        label="CEP"
-        placeholder="00000-000"
-        value={delivery.cep}
-        onChange={(event) => onCepChange(event.target.value)}
-        error={delivery.cep !== "" && delivery.cep.replace(/\D/g, "").length !== 8}
-        helperText={
-          delivery.cep !== "" && delivery.cep.replace(/\D/g, "").length !== 8
-            ? "Informe um CEP com 8 números."
-            : "O CEP será usado para preencher os dados do endereço."
-        }
-        sx={fieldSx}
-        slotProps={{
-          htmlInput: { inputMode: "numeric", maxLength: 9, required: true },
-          input: {
-            endAdornment: isSearchingCep ? <CircularProgress size={16} /> : undefined,
-          },
-        }}
-      />
-
-      {cepNotFound && (
-        <Alert severity="info" sx={{ borderRadius: "10px" }}>
-          CEP não localizado. Preencha o endereço manualmente.
-        </Alert>
-      )}
-
-      <TextField
-        required
-        label="Endereço (rua / avenida)"
-        value={delivery.street}
-        onChange={(event) => onChange({ street: event.target.value })}
-        sx={fieldSx}
-      />
-
-      <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "1fr 2fr" }}>
-        <TextField
-          required
-          label="Número"
-          value={delivery.number}
-          onChange={(event) => onChange({ number: event.target.value })}
-          sx={fieldSx}
-        />
-        <TextField
-          label="Complemento"
-          value={delivery.complement}
-          onChange={(event) => onChange({ complement: event.target.value })}
-          sx={fieldSx}
-        />
-      </Box>
+          <Button
+            color="error"
+            onClick={() => void handleDelete()}
+            disabled={isDeletingAddress}
+            sx={{ textTransform: "none" }}
+          >
+            Excluir endereço
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   );
 }
