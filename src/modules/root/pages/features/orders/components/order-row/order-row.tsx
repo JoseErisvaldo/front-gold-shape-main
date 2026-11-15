@@ -141,18 +141,23 @@ export function OrderRow({ order }: OrderRowProps) {
                 <Detail label="WhatsApp" value={order.whatsapp ?? "—"} />
                 <Detail label="Endereço de entrega" value={address} />
                 <Detail label="Meio de pagamento" value={order.paymentMethod?.name ?? "—"} />
+                {order.mercadoPagoStatus && (
+                  <Detail
+                    label="Status Mercado Pago"
+                    value={[order.mercadoPagoStatus, order.mercadoPagoStatusDetail]
+                      .filter(Boolean)
+                      .join(" — ")}
+                  />
+                )}
+                {order.mercadoPagoOrderId && (
+                  <Detail label="Identificador Mercado Pago" value={order.mercadoPagoOrderId} />
+                )}
                 <Detail
                   label="Taxa de entrega"
                   value={
                     order.deliveryFeePending ? "A combinar" : formatCents(order.deliveryFee ?? 0)
                   }
                 />
-                {order.cashReceived !== null && order.cashReceived !== undefined && (
-                  <Detail
-                    label="Cliente pagará em dinheiro com"
-                    value={formatCents(order.cashReceived)}
-                  />
-                )}
                 <Detail label="Pago em" value={order.paidAt ? formatDateTime(order.paidAt) : "—"} />
                 <TextField
                   select

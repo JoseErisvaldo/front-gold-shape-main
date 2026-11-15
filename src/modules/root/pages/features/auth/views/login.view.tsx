@@ -1,4 +1,6 @@
 // ATENÇÃO: coloque goldshape-logo.png ao lado do login.css (ou ajuste este caminho).
+
+import { Link } from "react-router-dom";
 import goldShapeLogo from "../../../../../../assets/goldshape-logo.png";
 import { LoginForm } from "../components/login-form";
 import "../login.css";
@@ -211,6 +213,9 @@ export function LoginView() {
               Entre com seus dados para continuar de onde parou.
             </p>
             <LoginForm />
+            <p className="login-panel__signup">
+              Ainda não tem conta? <Link to="/register">Criar conta</Link>
+            </p>
           </div>
         </section>
       </div>

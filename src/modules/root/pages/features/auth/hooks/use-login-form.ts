@@ -31,7 +31,7 @@ export function useLoginForm() {
     try {
       const session = await loginService({ email, password });
       setSession(session);
-      await navigate("/home", { replace: true });
+      await navigate("/redirect", { replace: true });
     } catch (error) {
       setIsRequestError(true);
       setNotice(error instanceof Error ? error.message : DEFAULT_ERROR_MESSAGE);

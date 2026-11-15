@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
-import { LoginView } from "./modules/root/pages/features/auth";
+import { LoginView, RegisterView } from "./modules/root/pages/features/auth";
+import { RedirectView } from "./modules/root/pages/features/auth/views/redirect.view";
 import { CategoriesView } from "./modules/root/pages/features/categories";
 import { DashboardView } from "./modules/root/pages/features/dashboard";
 import { DeliveryAreasListView } from "./modules/root/pages/features/delivery-areas";
@@ -22,13 +23,22 @@ import { useAuthStore } from "./shared/store";
 function LoginRoute() {
   const session = useAuthStore((state) => state.session);
 
-  return session ? <Navigate to="/home" replace /> : <LoginView />;
+  return session ? <Navigate to="/redirect" replace /> : <LoginView />;
+}
+
+function RegisterRoute() {
+  const session = useAuthStore((state) => state.session);
+
+  return session ? <Navigate to="/redirect" replace /> : <RegisterView />;
 }
 
 function ProtectedHomeRoute() {
   const session = useAuthStore((state) => state.session);
 
   if (!session) return <Navigate to="/session" replace />;
+  if (session.role !== "ADMIN" && session.role !== "MODERADOR") {
+    return <Navigate to="/redirect" replace />;
+  }
 
   return <Outlet />;
 }
@@ -53,6 +63,8 @@ function App() {
 
       <Routes>
         <Route path="/session" element={<LoginRoute />} />
+        <Route path="/register" element={<RegisterRoute />} />
+        <Route path="/redirect" element={<RedirectView />} />
         <Route path="/" element={<StorefrontView />} />
         <Route path="/loja" element={<StoreProfileView />} />
         <Route element={<ProtectedHomeRoute />}>

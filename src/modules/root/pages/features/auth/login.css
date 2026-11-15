@@ -698,20 +698,16 @@
   text-align: center;
 }
 
-.login-panel__signup button {
+.login-panel__signup a {
   margin-left: 2px;
-  padding: 0;
-  border: 0;
   color: var(--gs-green-700);
-  background: none;
-  cursor: pointer;
   font-size: inherit;
   font-weight: 600;
   text-decoration: none;
   transition: color 150ms ease;
 }
 
-.login-panel__signup button:hover {
+.login-panel__signup a:hover {
   color: var(--gs-green-800);
   text-decoration: underline;
 }
@@ -730,6 +726,51 @@
   text-decoration: underline;
   text-decoration-color: #cfd8d2;
   text-underline-offset: 2px;
+}
+
+.register-page {
+  padding: 24px;
+}
+
+.register-card {
+  width: min(100%, 500px);
+  padding: clamp(28px, 6vw, 52px);
+  border: 1px solid rgb(15 48 27 / 8%);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(11 36 21 / 10%);
+}
+
+.register-page__brand {
+  margin-bottom: 36px;
+  color: var(--gs-ink);
+}
+
+.register-card h1 {
+  margin: 13px 0 9px;
+  color: var(--gs-ink);
+  font-family: Manrope, "DM Sans", sans-serif;
+  font-size: clamp(27px, 2.35vw, 34px);
+  font-weight: 700;
+  letter-spacing: -1.55px;
+  line-height: 1.25;
+}
+
+.register-card h1 span {
+  color: var(--gs-green-600);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.register-form__success {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
 }
 
 /* ---------- Responsivo ---------- */
@@ -834,7 +875,7 @@
   .login-field .MuiOutlinedInput-root,
   .login-field .MuiOutlinedInput-notchedOutline,
   .login-form__forgot,
-  .login-panel__signup button {
+  .login-panel__signup a {
     transition: none;
   }
 }

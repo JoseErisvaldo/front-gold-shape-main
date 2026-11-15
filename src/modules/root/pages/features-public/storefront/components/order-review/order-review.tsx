@@ -15,6 +15,7 @@ type OrderReviewProps = {
   total: number;
   onEditDelivery: () => void;
   isPixSelected?: boolean;
+  isCardSelected?: boolean;
   customerName: string;
   customerWhatsapp: string;
 };
@@ -76,6 +77,7 @@ export function OrderReview({
   total,
   onEditDelivery,
   isPixSelected = true,
+  isCardSelected = false,
   customerName,
   customerWhatsapp,
 }: OrderReviewProps) {
@@ -271,15 +273,21 @@ export function OrderReview({
 
           <Box sx={{ my: 0.5, borderTop: "1px solid #EEF0F6" }} />
 
-          <ValueRow
-            strong
-            label={isFeeToAgree ? "Total parcial (sem entrega)" : "Total"}
-            value={formatPrice(total)}
-          />
+          {isCardSelected ? (
+            <Typography sx={{ color: "#5A5F73", fontSize: 13, lineHeight: 1.6 }}>
+              O total final do cartão é o valor exibido pelo Mercado Pago na opção de parcelas.
+            </Typography>
+          ) : (
+            <ValueRow
+              strong
+              label={isFeeToAgree ? "Total parcial (sem entrega)" : "Total"}
+              value={formatPrice(total)}
+            />
+          )}
 
           {isFeeToAgree && (
             <Typography sx={{ color: "#858A9D", fontSize: 12, lineHeight: 1.6 }}>
-              O valor da entrega será combinado com a loja pelo WhatsApp.
+              O valor da entrega será combinado com a loja após a confirmação do pedido.
             </Typography>
           )}
         </Box>

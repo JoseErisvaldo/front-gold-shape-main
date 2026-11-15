@@ -1,6 +1,16 @@
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
-import { Badge, Box, ButtonBase, IconButton, Skeleton, Tooltip, Typography } from "@mui/material";
+import {
+  Badge,
+  Box,
+  Button,
+  ButtonBase,
+  IconButton,
+  Skeleton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import goldShapeLogo from "../../../../../../../assets/goldshape-logo.png";
 import { trackEvent } from "../../helpers/storefront-analytics";
 
@@ -8,8 +18,10 @@ type StorefrontHeaderProps = {
   storeName: string;
   isStoreLoading: boolean;
   logoSrc?: string;
+  isAuthenticated: boolean;
   itemsCount: number;
   onHomeClick: () => void;
+  onLogout: () => void;
   onStoreClick: () => void;
   onCartClick: () => void;
 };
@@ -19,8 +31,10 @@ const ICON_BUTTON_SX = { width: 44, height: 44, color: "#292D45" } as const;
 export function StorefrontHeader({
   storeName,
   isStoreLoading,
+  isAuthenticated,
   itemsCount,
   onHomeClick,
+  onLogout,
   onStoreClick,
   onCartClick,
 }: StorefrontHeaderProps) {
@@ -107,6 +121,25 @@ export function StorefrontHeader({
               <ShoppingBagOutlinedIcon />
             </Badge>
           </IconButton>
+
+          {isAuthenticated && (
+            <Button
+              aria-label="Sair da conta"
+              onClick={onLogout}
+              startIcon={<LogoutRoundedIcon />}
+              sx={{
+                minWidth: 44,
+                minHeight: 44,
+                px: { xs: 1, sm: 1.5 },
+                borderRadius: "10px",
+                color: "#292D45",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
+            >
+              Sair
+            </Button>
+          )}
         </Box>
       </Box>
     </Box>

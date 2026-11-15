@@ -1,5 +1,8 @@
 import { Box } from "@mui/material";
 import type { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
+import { queryClient } from "../../../../../../../shared/services/queries";
+import { useAuthStore } from "../../../../../../../shared/store";
 import { useStorefrontLayout } from "../../hooks/use-storefront-layout";
 import { CartDrawer } from "../cart-drawer/cart-drawer";
 import { StorefrontFooter } from "../storefront-footer/storefront-footer";
@@ -19,8 +22,17 @@ export function StorefrontLayout({
   onHomeClick,
   onStoreClick,
 }: StorefrontLayoutProps) {
+  const navigate = useNavigate();
+  const session = useAuthStore((state) => state.session);
+  const clearSession = useAuthStore((state) => state.clearSession);
   const { storeName, isStoreLoading, whatsappUrl, itemsCount, isCartOpen, openCart, closeCart } =
     useStorefrontLayout();
+
+  const handleLogout = () => {
+    clearSession();
+    queryClient.clear();
+    void navigate("/session", { replace: true });
+  };
 
   return (
     <Box
@@ -36,8 +48,10 @@ export function StorefrontLayout({
         storeName={storeName}
         isStoreLoading={isStoreLoading}
         logoSrc={logoSrc}
+        isAuthenticated={Boolean(session)}
         itemsCount={itemsCount}
         onHomeClick={onHomeClick}
+        onLogout={handleLogout}
         onStoreClick={onStoreClick}
         onCartClick={openCart}
       />
