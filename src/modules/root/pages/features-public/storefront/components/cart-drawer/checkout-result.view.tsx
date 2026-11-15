@@ -10,11 +10,10 @@ import type { CheckoutStatus } from "../../services/create-checkout.service";
 type Props = {
   order: CheckoutStatus;
   refreshError: unknown;
-  onRetry: () => void;
   onClose: () => void;
 };
 
-export function CheckoutResultView({ order, refreshError, onRetry, onClose }: Props) {
+export function CheckoutResultView({ order, refreshError, onClose }: Props) {
   const isPaid = order.status === "PAID";
   const isCanceled = order.status === "CANCELED";
 
@@ -154,7 +153,7 @@ export function CheckoutResultView({ order, refreshError, onRetry, onClose }: Pr
       )}
       <Button
         variant="contained"
-        onClick={isCanceled ? onRetry : onClose}
+        onClick={onClose}
         sx={{
           minWidth: 180,
           bgcolor: "#16A34A",
@@ -162,7 +161,7 @@ export function CheckoutResultView({ order, refreshError, onRetry, onClose }: Pr
           "&:hover": { bgcolor: "#15803D" },
         }}
       >
-        {isCanceled ? "Tentar novamente" : isPaid ? "Concluir" : "Fechar"}
+        {isCanceled ? "Voltar à loja" : isPaid ? "Concluir" : "Fechar"}
       </Button>
     </Stack>
   );

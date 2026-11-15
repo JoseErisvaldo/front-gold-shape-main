@@ -148,17 +148,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
       (query.state.data?.status ?? checkoutResult?.status) === "PENDING" ? 5_000 : false,
   });
   const currentCheckout = checkoutStatusQuery.data ?? checkoutResult;
-  const clearedOrderNsu = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (
-      currentCheckout?.status === "PAID" &&
-      clearedOrderNsu.current !== currentCheckout.orderNsu
-    ) {
-      clearedOrderNsu.current = currentCheckout.orderNsu;
-      clear();
-    }
-  }, [clear, currentCheckout?.orderNsu, currentCheckout?.status]);
 
   const refreshCartPricesRef = useRef(refreshCartPrices);
   useEffect(() => {
@@ -204,8 +193,8 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const submitPixPayment = async () => {
     const result = await checkout(customerWhatsapp, paymentMethodId, true, { type: "pix" });
     if (result) {
-      clearedOrderNsu.current = null;
       setCheckoutResult(result);
+      clear();
       setIsConfirmDialogOpen(false);
     }
   };
@@ -256,8 +245,8 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
       };
       const result = await checkout(customerWhatsapp, cardPaymentMethodId, false, payment);
       if (!result) throw new Error("Não foi possível iniciar o pagamento.");
-      clearedOrderNsu.current = null;
       setCheckoutResult(result);
+      clear();
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Não foi possível processar o cartão.";
@@ -266,11 +255,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
     }
   };
 
-  const retryCheckout = () => {
-    setCheckoutResult(null);
-    setPaymentMethodId("");
-    clearedOrderNsu.current = null;
-  };
   const showBackButton = isDeliveryStep || isReviewStep;
 
   const title = isReviewStep
@@ -343,9 +327,8 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
           <CheckoutResultView
             order={currentCheckout}
             refreshError={checkoutStatusQuery.error}
-            onRetry={retryCheckout}
             onClose={() => {
-              if (currentCheckout.status !== "PENDING") setCheckoutResult(null);
+              setCheckoutResult(null);
               onClose();
             }}
           />
