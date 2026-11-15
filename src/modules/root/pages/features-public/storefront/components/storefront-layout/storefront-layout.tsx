@@ -58,6 +58,7 @@ export function StorefrontLayout({
         itemsCount={itemsCount}
         onHomeClick={onHomeClick}
         onLogout={handleLogout}
+        onOrdersClick={() => void navigate("/meus-pedidos")}
         onStoreClick={onStoreClick}
         onCartClick={openCart}
       />

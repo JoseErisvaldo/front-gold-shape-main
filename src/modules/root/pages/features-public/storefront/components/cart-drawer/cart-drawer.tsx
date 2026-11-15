@@ -342,7 +342,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         ) : currentCheckout ? (
           <CheckoutResultView
             order={currentCheckout}
-            isRefreshing={checkoutStatusQuery.isFetching}
             refreshError={checkoutStatusQuery.error}
             onRetry={retryCheckout}
             onClose={() => {

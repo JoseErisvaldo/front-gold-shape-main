@@ -13,6 +13,7 @@ import { ProductsListView } from "./modules/root/pages/features/products";
 import { CreateProductView } from "./modules/root/pages/features/products/views/create-product.view";
 import { StoresView } from "./modules/root/pages/features/store";
 import { ProfileView } from "./modules/root/pages/features/users";
+import { CustomerOrdersView } from "./modules/root/pages/features-public/customer-orders";
 import { StoreProfileView } from "./modules/root/pages/features-public/store-profile";
 import { StorefrontView } from "./modules/root/pages/features-public/storefront";
 import { AppLayout } from "./shared/components/layout";
@@ -29,6 +30,11 @@ function RegisterRoute() {
   const session = useAuthStore((state) => state.session);
 
   return session ? <Navigate to="/redirect" replace /> : <RegisterView />;
+}
+
+function CustomerOrdersRoute() {
+  const session = useAuthStore((state) => state.session);
+  return session ? <CustomerOrdersView /> : <Navigate to="/session" replace />;
 }
 
 function ProtectedHomeRoute() {
@@ -66,6 +72,7 @@ function App() {
         <Route path="/redirect" element={<RedirectView />} />
         <Route path="/" element={<StorefrontView />} />
         <Route path="/loja" element={<StoreProfileView />} />
+        <Route path="/meus-pedidos" element={<CustomerOrdersRoute />} />
         <Route element={<ProtectedHomeRoute />}>
           <Route element={<AuthenticatedLayout />}>
             <Route path="/home" element={<HomeView />} />

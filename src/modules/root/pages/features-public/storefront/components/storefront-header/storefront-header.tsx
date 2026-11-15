@@ -1,4 +1,5 @@
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import {
@@ -22,11 +23,12 @@ type StorefrontHeaderProps = {
   itemsCount: number;
   onHomeClick: () => void;
   onLogout: () => void;
+  onOrdersClick: () => void;
   onStoreClick: () => void;
   onCartClick: () => void;
 };
 
-const ICON_BUTTON_SX = { width: 44, height: 44, color: "#292D45" } as const;
+const ICON_BUTTON_SX = { width: { xs: 40, sm: 44 }, height: 44, color: "#292D45" } as const;
 
 export function StorefrontHeader({
   storeName,
@@ -35,6 +37,7 @@ export function StorefrontHeader({
   itemsCount,
   onHomeClick,
   onLogout,
+  onOrdersClick,
   onStoreClick,
   onCartClick,
 }: StorefrontHeaderProps) {
@@ -96,11 +99,19 @@ export function StorefrontHeader({
             <IconButton
               aria-label="Ver perfil da loja"
               onClick={handleStoreClick}
-              sx={ICON_BUTTON_SX}
+              sx={{ ...ICON_BUTTON_SX, display: { xs: "none", sm: "inline-flex" } }}
             >
               <StorefrontOutlinedIcon />
             </IconButton>
           </Tooltip>
+
+          {isAuthenticated && (
+            <Tooltip title="Meus pedidos">
+              <IconButton aria-label="Ver meus pedidos" onClick={onOrdersClick} sx={ICON_BUTTON_SX}>
+                <ReceiptLongRoundedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
 
           <IconButton
             aria-label={`Abrir carrinho, ${itemsCount} ${itemsCount === 1 ? "item" : "itens"}`}
@@ -137,7 +148,9 @@ export function StorefrontHeader({
                 textTransform: "none",
               }}
             >
-              Sair
+              <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+                Sair
+              </Box>
             </Button>
           )}
         </Box>

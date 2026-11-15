@@ -1,20 +1,20 @@
+import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
-import { Alert, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import { toast } from "sonner";
 import { formatPrice } from "../../helpers/format-price";
 import type { CheckoutStatus } from "../../services/create-checkout.service";
 
 type Props = {
   order: CheckoutStatus;
-  isRefreshing: boolean;
   refreshError: unknown;
   onRetry: () => void;
   onClose: () => void;
 };
 
-export function CheckoutResultView({ order, isRefreshing, refreshError, onRetry, onClose }: Props) {
+export function CheckoutResultView({ order, refreshError, onRetry, onClose }: Props) {
   const isPaid = order.status === "PAID";
   const isCanceled = order.status === "CANCELED";
 
@@ -71,7 +71,19 @@ export function CheckoutResultView({ order, isRefreshing, refreshError, onRetry,
           <ErrorOutlineRoundedIcon sx={{ fontSize: 74 }} />
         </Box>
       ) : (
-        <CircularProgress size={36} />
+        <Box
+          sx={{
+            width: 108,
+            height: 108,
+            display: "grid",
+            placeItems: "center",
+            borderRadius: "50%",
+            bgcolor: "#FFF7ED",
+            color: "#C2410C",
+          }}
+        >
+          <AccessTimeRoundedIcon sx={{ fontSize: 64 }} />
+        </Box>
       )}
       <Box>
         <Typography variant="h6" sx={{ color: "#292D45", fontWeight: 800 }}>
@@ -134,11 +146,6 @@ export function CheckoutResultView({ order, isRefreshing, refreshError, onRetry,
         >
           Abrir página de pagamento
         </Button>
-      )}
-      {isRefreshing && (
-        <Typography variant="caption" color="text.secondary">
-          Atualizando status do pagamento…
-        </Typography>
       )}
       {Boolean(refreshError) && (
         <Alert severity="warning" sx={{ width: "100%", textAlign: "left" }}>

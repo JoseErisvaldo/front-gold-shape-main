@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuthStore } from "../../../../../../shared/store";
 import { handleApiError } from "../../../../../../shared/utils";
+import { customerOrdersQueryKeys } from "../../customer-orders/endpoints-keys/customer-orders.keys";
 import { storefrontQueryKeys } from "../endpoints-keys/storefront.keys";
 import { trackEvent, trackPageview } from "../helpers/storefront-analytics";
 import type { CustomerAddressInput } from "../schema/customer-address-schema";
@@ -224,6 +225,7 @@ export function useCartDrawer() {
         payment,
         isPix,
       );
+      await queryClient.invalidateQueries({ queryKey: customerOrdersQueryKeys.all });
       setCheckoutPriceChanged(false);
       trackEvent("payment_checkout_created", {
         items_count: itemsCount,
