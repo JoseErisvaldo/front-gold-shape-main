@@ -1,7 +1,6 @@
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import {
   Box,
   Chip,
@@ -36,12 +35,6 @@ function Detail({ label, value }: { label: string; value: string }) {
       </Typography>
     </Box>
   );
-}
-
-function getWhatsAppUrl(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  const internationalNumber = digits.startsWith("55") ? digits : `55${digits}`;
-  return `https://wa.me/${internationalNumber}`;
 }
 
 export function OrderRow({ order }: OrderRowProps) {
@@ -90,25 +83,7 @@ export function OrderRow({ order }: OrderRowProps) {
           </IconButton>
         </TableCell>
         <TableCell>{formatDateTime(order.createdAt)}</TableCell>
-        <TableCell>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <span>{order.customerName || "—"}</span>
-            {order.whatsapp && (
-              <IconButton
-                component="a"
-                href={getWhatsAppUrl(order.whatsapp)}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Abrir WhatsApp de ${order.customerName || "cliente"}`}
-                title="Conversar pelo WhatsApp"
-                size="small"
-                sx={{ color: "#25D366" }}
-              >
-                <WhatsAppIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </TableCell>
+        <TableCell>{order.customerName || "—"}</TableCell>
         <TableCell>
           <Chip size="small" label={status.label} color={status.color} />
         </TableCell>

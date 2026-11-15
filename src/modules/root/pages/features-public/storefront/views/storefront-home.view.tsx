@@ -24,7 +24,6 @@ export function StorefrontHomeView({ onProductClick }: StorefrontHomeViewProps) 
   const {
     storeName,
     storeImageUrl,
-    whatsappUrl,
     featuredProducts,
     offers,
     categories,
@@ -67,7 +66,6 @@ export function StorefrontHomeView({ onProductClick }: StorefrontHomeViewProps) 
         isLoading={false}
         storeName={storeName}
         storeImageUrl={storeImageUrl}
-        whatsappUrl={whatsappUrl}
         onProductClick={handleProductClick}
         onQuickAdd={addToCart}
         onBrowseClick={browseCatalog}

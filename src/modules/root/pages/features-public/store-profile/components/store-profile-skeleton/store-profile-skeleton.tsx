@@ -1,6 +1,6 @@
 import { Box, Paper, Skeleton } from "@mui/material";
 
-const DETAIL_PLACEHOLDERS = ["whatsapp", "address", "delivery", "hours"] as const;
+const DETAIL_PLACEHOLDERS = ["address", "delivery", "hours"] as const;
 
 export function StoreProfileSkeleton() {
   return (

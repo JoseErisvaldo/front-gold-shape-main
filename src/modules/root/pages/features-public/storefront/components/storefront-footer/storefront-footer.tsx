@@ -1,7 +1,6 @@
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -9,10 +8,9 @@ import { PaymentMethodsDrawer } from "../payment-methods-drawer/payment-methods-
 
 type StorefrontFooterProps = {
   storeName: string;
-  whatsappUrl: string | null;
 };
 
-export function StorefrontFooter({ storeName, whatsappUrl }: StorefrontFooterProps) {
+export function StorefrontFooter({ storeName }: StorefrontFooterProps) {
   const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
   const displayName = storeName || "Loja";
 
@@ -91,31 +89,6 @@ export function StorefrontFooter({ storeName, whatsappUrl }: StorefrontFooterPro
           >
             Formas de pagamento
           </Button>
-          {whatsappUrl && (
-            <Button
-              variant="outlined"
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              startIcon={<WhatsAppIcon />}
-              sx={{
-                minHeight: 40,
-                px: 1.5,
-                borderRadius: "9px",
-                color: "#16A34A",
-                borderColor: "#16A34A",
-                fontSize: 12,
-                fontWeight: 600,
-                textTransform: "none",
-                whiteSpace: "nowrap",
-                minWidth: 0,
-                "& .MuiButton-startIcon": { mr: 0.75 },
-                "&:hover": { bgcolor: "#F0FDF4", borderColor: "#15803D" },
-              }}
-            >
-              Falar no WhatsApp
-            </Button>
-          )}
           <Button
             variant="outlined"
             href="https://www.instagram.com/suplementosgoldshapelouveira/"

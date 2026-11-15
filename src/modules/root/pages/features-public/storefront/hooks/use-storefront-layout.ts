@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { buildWhatsAppUrl } from "../helpers/build-whatsapp";
 import { usePublicStoreQuery } from "../queries/use-public-store-query";
 import { useCartStore } from "../store/cart.store";
 import { useCartSummary } from "./use-cart-summary";
@@ -22,11 +21,6 @@ export function useStorefrontLayout() {
     storeName,
     storeImageUrl: store?.imageUrl ?? null,
     isStoreLoading: storeQuery.isPending,
-    whatsapp: store?.whatsapp ?? null,
-    whatsappUrl: buildWhatsAppUrl(
-      store?.whatsapp,
-      `Olá! Vim pelo catálogo da ${storeName || "loja"} e gostaria de ajuda.`,
-    ),
     itemsCount,
     isCartOpen,
     openCart,

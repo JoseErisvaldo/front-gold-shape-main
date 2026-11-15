@@ -11,17 +11,8 @@ type StoreProfileViewProps = {
 };
 
 export function StoreProfileView({ onBack }: StoreProfileViewProps) {
-  const {
-    store,
-    profile,
-    isPending,
-    isError,
-    isFetching,
-    refetch,
-    whatsappLabel,
-    whatsappUrl,
-    mapsUrl,
-  } = useStoreProfilePage();
+  const { store, profile, isPending, isError, isFetching, refetch, mapsUrl } =
+    useStoreProfilePage();
 
   const hasTrackedPageview = useRef(false);
 
@@ -73,15 +64,7 @@ export function StoreProfileView({ onBack }: StoreProfileViewProps) {
         </Alert>
       )}
 
-      {store && (
-        <StoreProfileCard
-          store={store}
-          profile={profile}
-          whatsappLabel={whatsappLabel}
-          whatsappUrl={whatsappUrl}
-          mapsUrl={mapsUrl}
-        />
-      )}
+      {store && <StoreProfileCard store={store} profile={profile} mapsUrl={mapsUrl} />}
     </Stack>
   );
 }

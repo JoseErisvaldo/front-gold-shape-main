@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { buildWhatsAppUrl } from "../helpers/build-whatsapp";
 import { CATALOG_SECTION_ID } from "../helpers/storefront-ids";
 import {
   DEFAULT_STOREFRONT_SORT,
@@ -86,7 +85,6 @@ export function useStorefrontHomePage() {
   return {
     storeName: storeQuery.data?.name ?? "",
     storeImageUrl: storeQuery.data?.imageUrl ?? null,
-    whatsappUrl: buildWhatsAppUrl(storeQuery.data?.whatsapp),
 
     featuredProducts: featuredQuery.data ?? [],
     isFeaturedLoading: featuredQuery.isPending,

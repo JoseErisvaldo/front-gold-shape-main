@@ -7,7 +7,6 @@ import { useStorefrontLayout } from "../../hooks/use-storefront-layout";
 import { CartDrawer } from "../cart-drawer/cart-drawer";
 import { StorefrontFooter } from "../storefront-footer/storefront-footer";
 import { StorefrontHeader } from "../storefront-header/storefront-header";
-import { WhatsAppFab } from "../whatsapp-fab/whatsapp-fab";
 
 type StorefrontLayoutProps = {
   onHomeClick: () => void;
@@ -19,16 +18,8 @@ export function StorefrontLayout({ children, onHomeClick, onStoreClick }: Storef
   const navigate = useNavigate();
   const session = useAuthStore((state) => state.session);
   const clearSession = useAuthStore((state) => state.clearSession);
-  const {
-    storeName,
-    storeImageUrl,
-    isStoreLoading,
-    whatsappUrl,
-    itemsCount,
-    isCartOpen,
-    openCart,
-    closeCart,
-  } = useStorefrontLayout();
+  const { storeName, storeImageUrl, isStoreLoading, itemsCount, isCartOpen, openCart, closeCart } =
+    useStorefrontLayout();
 
   useEffect(() => {
     if (session && sessionStorage.getItem("goldshape-storefront-checkout-step") === "delivery") {
@@ -79,11 +70,9 @@ export function StorefrontLayout({ children, onHomeClick, onStoreClick }: Storef
         {children}
       </Box>
 
-      <StorefrontFooter storeName={storeName} whatsappUrl={whatsappUrl} />
+      <StorefrontFooter storeName={storeName} />
 
       <CartDrawer open={isCartOpen} onClose={closeCart} />
-
-      {whatsappUrl && <WhatsAppFab href={whatsappUrl} />}
     </Box>
   );
 }

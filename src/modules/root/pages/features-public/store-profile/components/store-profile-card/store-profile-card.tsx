@@ -2,7 +2,6 @@ import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
 import PlaceRoundedIcon from "@mui/icons-material/PlaceRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Avatar, Box, Button, Chip, Paper, Typography } from "@mui/material";
 import type { ReactNode } from "react";
 import { getStoreInitials } from "../../../storefront/helpers/store-initials";
@@ -19,8 +18,6 @@ import type { StoreProfileInfo } from "../../types/store-profile.types";
 type StoreProfileCardProps = {
   store: PublicStore;
   profile: StoreProfileInfo;
-  whatsappLabel: string | null;
-  whatsappUrl: string | null;
   mapsUrl: string;
 };
 
@@ -41,25 +38,10 @@ const ICON_BOX_SX = {
   bgcolor: "#F0FDF4",
 } as const;
 
-export function StoreProfileCard({
-  store,
-  profile,
-  whatsappLabel,
-  whatsappUrl,
-  mapsUrl,
-}: StoreProfileCardProps) {
+export function StoreProfileCard({ store, profile, mapsUrl }: StoreProfileCardProps) {
   const today = getTodayWeekDay();
 
   const details: DetailItem[] = [
-    ...(whatsappLabel
-      ? [
-          {
-            label: "WhatsApp",
-            lines: [whatsappLabel],
-            icon: <WhatsAppIcon fontSize="small" />,
-          },
-        ]
-      : []),
     {
       label: "Endereço",
       lines: formatAddressLines(profile.address),
@@ -304,28 +286,6 @@ export function StoreProfileCard({
             mt: 3,
           }}
         >
-          {whatsappUrl && (
-            <Button
-              fullWidth
-              disableElevation
-              variant="contained"
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              startIcon={<WhatsAppIcon />}
-              sx={{
-                minHeight: 46,
-                borderRadius: "10px",
-                bgcolor: "#16A34A",
-                fontWeight: 700,
-                textTransform: "none",
-                "&:hover": { bgcolor: "#15803D" },
-              }}
-            >
-              Chamar no WhatsApp
-            </Button>
-          )}
-
           <Button
             fullWidth
             variant="outlined"

@@ -2,7 +2,6 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Box, Button, Chip, IconButton, Skeleton, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { formatPrice } from "../../helpers/format-price";
@@ -19,7 +18,6 @@ type HeroBannerProps = {
   isLoading: boolean;
   storeName: string;
   storeImageUrl: string | null;
-  whatsappUrl: string | null;
   onProductClick: (product: PublicProduct) => void;
   onQuickAdd: (product: PublicProduct, variant: PublicVariant) => void;
   onBrowseClick: () => void;
@@ -81,7 +79,6 @@ export function HeroBanner({
   isLoading,
   storeName,
   storeImageUrl,
-  whatsappUrl,
   onProductClick,
   onQuickAdd,
   onBrowseClick,
@@ -209,19 +206,6 @@ export function HeroBanner({
             <Button disableElevation onClick={onBrowseClick} sx={primaryButtonSx}>
               Explorar produtos
             </Button>
-
-            {whatsappUrl && (
-              <Button
-                variant="outlined"
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                startIcon={<WhatsAppIcon />}
-                sx={secondaryButtonSx}
-              >
-                Falar no WhatsApp
-              </Button>
-            )}
           </Box>
         </Box>
         <Box
