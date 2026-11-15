@@ -1,4 +1,6 @@
 import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
+import EditRoundedIcon from "@mui/icons-material/EditRounded";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import UpdateRoundedIcon from "@mui/icons-material/UpdateRounded";
@@ -12,12 +14,14 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  Avatar,
   Paper,
   TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { useUpdateStoreAddressMutation } from "../../mutations/use-update-store-address-mutation";
+import { useUpdateStoreProfileMutation } from "../../mutations/use-update-store-profile-mutation";
 import type { Store } from "../../types/store.types";
 
 type StoreCardProps = {
@@ -46,6 +50,11 @@ function formatDate(date?: string) {
 
 export function StoreCard({ store }: StoreCardProps) {
   const [isOriginDialogOpen, setIsOriginDialogOpen] = useState(false);
+  const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
+  const [profile, setProfile] = useState({
+    name: store.name,
+    imageUrl: store.imageUrl ?? "",
+  });
   const [originAddress, setOriginAddress] = useState({
     originCep: store.originCep ?? "",
     originStreet: store.originStreet ?? "",
@@ -56,6 +65,24 @@ export function StoreCard({ store }: StoreCardProps) {
     originState: store.originState ?? "",
   });
   const updateOriginAddress = useUpdateStoreAddressMutation(store.id);
+  const updateStoreProfile = useUpdateStoreProfileMutation(store.id);
+
+  const openProfileDialog = () => {
+    setProfile({ name: store.name, imageUrl: store.imageUrl ?? "" });
+    setIsProfileDialogOpen(true);
+  };
+
+  const saveProfile = async () => {
+    try {
+      await updateStoreProfile.mutateAsync({
+        name: profile.name.trim(),
+        imageUrl: profile.imageUrl.trim() || null,
+      });
+      setIsProfileDialogOpen(false);
+    } catch {
+      return;
+    }
+  };
 
   const openOriginDialog = () => {
     setOriginAddress({
@@ -118,20 +145,21 @@ export function StoreCard({ store }: StoreCardProps) {
           background: "linear-gradient(135deg, rgba(22,163,74,0.08), rgba(22,163,74,0.015))",
         }}
       >
-        <Box
+        <Avatar
+          src={store.imageUrl ?? undefined}
+          alt={`Logo da ${store.name}`}
+          slotProps={{ img: { sx: { objectFit: "cover" } } }}
           sx={{
             width: 68,
             height: 68,
             flexShrink: 0,
-            display: "grid",
-            placeItems: "center",
-            borderRadius: "18px",
             color: "#16A34A",
             bgcolor: "#dcfce7",
+            borderRadius: "18px",
           }}
         >
           <StorefrontRoundedIcon sx={{ fontSize: 36 }} />
-        </Box>
+        </Avatar>
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography
@@ -213,9 +241,23 @@ export function StoreCard({ store }: StoreCardProps) {
             value={store.active ? "Ativa e disponível" : "Inativa"}
           />
         </Box>
-        <Button variant="outlined" onClick={openOriginDialog} sx={{ mt: 2, textTransform: "none" }}>
-          Configurar endereço de origem
-        </Button>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 2 }}>
+          <Button
+            variant="outlined"
+            startIcon={<EditRoundedIcon />}
+            onClick={openProfileDialog}
+            sx={{ textTransform: "none" }}
+          >
+            Editar nome e imagem
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={openOriginDialog}
+            sx={{ textTransform: "none" }}
+          >
+            Configurar endereço de origem
+          </Button>
+        </Box>
 
         <Divider sx={{ my: 3.5 }} />
 
@@ -246,6 +288,62 @@ export function StoreCard({ store }: StoreCardProps) {
           />
         </Box>
       </Box>
+
+      <Dialog
+        open={isProfileDialogOpen}
+        onClose={() => setIsProfileDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Perfil da loja</DialogTitle>
+        <DialogContent sx={{ display: "grid", gap: 2, pt: "12px !important" }}>
+          <Typography sx={{ color: "#6b7280", fontSize: 13 }}>
+            Atualize o nome e o link público da imagem da loja.
+          </Typography>
+          <TextField
+            required
+            label="Nome da loja"
+            value={profile.name}
+            onChange={(event) =>
+              setProfile((current) => ({ ...current, name: event.target.value }))
+            }
+          />
+          <TextField
+            label="URL da imagem da loja"
+            type="url"
+            placeholder="https://exemplo.com/logo.png"
+            value={profile.imageUrl}
+            onChange={(event) =>
+              setProfile((current) => ({ ...current, imageUrl: event.target.value }))
+            }
+            helperText="Deixe vazio para remover a imagem."
+          />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Avatar
+              src={profile.imageUrl.trim() || undefined}
+              alt={`Prévia da logo da ${profile.name || "loja"}`}
+            >
+              <ImageOutlinedIcon />
+            </Avatar>
+            <Typography sx={{ color: "#6b7280", fontSize: 13 }}>
+              Prévia da imagem da loja
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button onClick={() => setIsProfileDialogOpen(false)} sx={{ textTransform: "none" }}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => void saveProfile()}
+            disabled={!profile.name.trim() || updateStoreProfile.isPending}
+            sx={{ textTransform: "none" }}
+          >
+            {updateStoreProfile.isPending ? "Salvando..." : "Salvar perfil"}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog
         open={isOriginDialogOpen}

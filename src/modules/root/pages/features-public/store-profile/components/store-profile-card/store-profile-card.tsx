@@ -1,10 +1,11 @@
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
 import PlaceRoundedIcon from "@mui/icons-material/PlaceRounded";
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Avatar, Box, Button, Chip, Paper, Typography } from "@mui/material";
 import type { ReactNode } from "react";
-import goldShapeLogo from "../../../../../../../assets/goldshape-logo.png";
+import { getStoreInitials } from "../../../storefront/helpers/store-initials";
 import type { PublicStore } from "../../../storefront/types/storefront.types";
 import { formatAddressLines } from "../../helpers/format-address";
 import {
@@ -18,7 +19,6 @@ import type { StoreProfileInfo } from "../../types/store-profile.types";
 type StoreProfileCardProps = {
   store: PublicStore;
   profile: StoreProfileInfo;
-  logoSrc?: string;
   whatsappLabel: string | null;
   whatsappUrl: string | null;
   mapsUrl: string;
@@ -44,7 +44,6 @@ const ICON_BOX_SX = {
 export function StoreProfileCard({
   store,
   profile,
-  logoSrc,
   whatsappLabel,
   whatsappUrl,
   mapsUrl,
@@ -104,7 +103,7 @@ export function StoreProfileCard({
           }}
         >
           <Avatar
-            src={logoSrc ?? goldShapeLogo}
+            src={store.imageUrl ?? undefined}
             alt={`Logo da ${store.name}`}
             slotProps={{ img: { sx: { objectFit: "cover" } } }}
             sx={{
@@ -115,7 +114,9 @@ export function StoreProfileCard({
               bgcolor: "#FFFFFF",
               boxShadow: "0 8px 20px rgba(15, 48, 27, 0.18)",
             }}
-          />
+          >
+            {getStoreInitials(store.name) || <StorefrontRoundedIcon />}
+          </Avatar>
 
           <Box sx={{ flex: 1, minWidth: 0, pt: { xs: 5.5, sm: 6.5 } }}>
             <Typography

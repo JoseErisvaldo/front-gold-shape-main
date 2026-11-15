@@ -122,7 +122,7 @@ export function StorefrontFooter({ storeName, whatsappUrl }: StorefrontFooterPro
             target="_blank"
             rel="noopener noreferrer"
             startIcon={<InstagramIcon />}
-            aria-label="Instagram Suplementos Gold Shape Louveira"
+            aria-label={`Instagram de ${storeName}`}
             sx={{
               minHeight: 40,
               px: 1.5,

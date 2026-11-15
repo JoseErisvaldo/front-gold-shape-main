@@ -4,7 +4,7 @@ import { storesSchema } from "../schema/store-schema";
 
 export async function getStoresService() {
   try {
-    const { data } = await apiClient.get("/stores");
+    const { data } = await apiClient.get("/store");
     return storesSchema.parse(data);
   } catch (error) {
     if (
@@ -14,7 +14,7 @@ export async function getStoresService() {
       typeof error.response === "object" &&
       error.response !== null &&
       "status" in error.response &&
-      error.response.status === 400 &&
+      error.response.status === 404 &&
       "data" in error.response &&
       typeof error.response.data === "object" &&
       error.response.data !== null &&

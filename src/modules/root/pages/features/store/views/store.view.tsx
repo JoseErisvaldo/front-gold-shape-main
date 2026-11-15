@@ -15,11 +15,13 @@ export function StoresView() {
     storeName,
     storeSlug,
     storeWhatsapp,
+    storeImageUrl,
     createStoreError,
     isCreatingStore,
     setStoreName,
     setStoreSlug,
     setStoreWhatsapp,
+    setStoreImageUrl,
     handleCreateStore,
     handleOpenCreateDialog,
     handleCloseCreateDialog,
@@ -61,11 +63,13 @@ export function StoresView() {
         storeName={storeName}
         storeSlug={storeSlug}
         storeWhatsapp={storeWhatsapp}
+        storeImageUrl={storeImageUrl}
         error={createStoreError}
         isSubmitting={isCreatingStore}
         onStoreNameChange={setStoreName}
         onStoreSlugChange={setStoreSlug}
         onStoreWhatsappChange={setStoreWhatsapp}
+        onStoreImageUrlChange={setStoreImageUrl}
         onClose={handleCloseCreateDialog}
         onSubmit={handleCreateStore}
       />

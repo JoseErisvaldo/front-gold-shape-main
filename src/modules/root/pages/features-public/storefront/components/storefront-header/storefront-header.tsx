@@ -2,7 +2,9 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import {
+  Avatar,
   Badge,
   Box,
   Button,
@@ -12,13 +14,13 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import goldShapeLogo from "../../../../../../../assets/goldshape-logo.png";
+import { getStoreInitials } from "../../helpers/store-initials";
 import { trackEvent } from "../../helpers/storefront-analytics";
 
 type StorefrontHeaderProps = {
   storeName: string;
+  storeImageUrl: string | null;
   isStoreLoading: boolean;
-  logoSrc?: string;
   isAuthenticated: boolean;
   itemsCount: number;
   onHomeClick: () => void;
@@ -32,6 +34,7 @@ const ICON_BUTTON_SX = { width: { xs: 40, sm: 44 }, height: 44, color: "#292D45"
 
 export function StorefrontHeader({
   storeName,
+  storeImageUrl,
   isStoreLoading,
   isAuthenticated,
   itemsCount,
@@ -76,7 +79,14 @@ export function StorefrontHeader({
           aria-label={`${storeName || "Loja"}, ir para o início`}
           sx={{ gap: 1.5, borderRadius: "12px", textAlign: "left" }}
         >
-          <img className="brand-mark" src={goldShapeLogo} alt="" width={44} height={44} />
+          <Avatar
+            src={storeImageUrl ?? undefined}
+            alt={`Logo da ${storeName || "loja"}`}
+            slotProps={{ img: { sx: { objectFit: "cover" } } }}
+            sx={{ width: 44, height: 44, bgcolor: "#DCFCE7", color: "#16A34A" }}
+          >
+            {storeName ? getStoreInitials(storeName) : <StorefrontRoundedIcon />}
+          </Avatar>
 
           {isStoreLoading ? (
             <Skeleton width={110} height={26} />

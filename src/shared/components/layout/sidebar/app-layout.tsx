@@ -1,21 +1,28 @@
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
-import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
+import { AppBar, Avatar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "./app-sidebar";
-import { GoldShape_SIDEBAR_CONFIG } from "./sidebar-config";
+import { APP_SIDEBAR_CONFIG } from "./sidebar-config";
 
 type AppLayoutProps = {
   onLogout: () => void;
+  storeName: string;
+  storeImageUrl: string | null;
 };
 
-export function AppLayout({ onLogout }: AppLayoutProps) {
+export function AppLayout({ onLogout, storeName, storeImageUrl }: AppLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f4f6fb" }}>
       <AppSidebar
-        config={GoldShape_SIDEBAR_CONFIG}
+        config={{
+          ...APP_SIDEBAR_CONFIG,
+          brand: storeName,
+          brandImageUrl: storeImageUrl,
+        }}
         mobileOpen={mobileSidebarOpen}
         onClose={() => setMobileSidebarOpen(false)}
         onItemClick={() => setMobileSidebarOpen(false)}
@@ -43,6 +50,14 @@ export function AppLayout({ onLogout }: AppLayoutProps) {
           >
             <MenuRoundedIcon />
           </IconButton>
+          <Avatar
+            src={storeImageUrl ?? undefined}
+            alt={`Logo da ${storeName}`}
+            slotProps={{ img: { sx: { objectFit: "cover" } } }}
+            sx={{ width: 34, height: 34, mr: 1, bgcolor: "#DCFCE7", color: "#16A34A" }}
+          >
+            <StorefrontRoundedIcon fontSize="small" />
+          </Avatar>
           <Typography
             component="span"
             sx={{
@@ -52,7 +67,7 @@ export function AppLayout({ onLogout }: AppLayoutProps) {
               letterSpacing: "-0.6px",
             }}
           >
-            GoldShape
+            {storeName}
           </Typography>
         </Toolbar>
       </AppBar>

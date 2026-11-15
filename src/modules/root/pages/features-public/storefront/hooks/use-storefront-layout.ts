@@ -20,6 +20,7 @@ export function useStorefrontLayout() {
 
   return {
     storeName,
+    storeImageUrl: store?.imageUrl ?? null,
     isStoreLoading: storeQuery.isPending,
     whatsapp: store?.whatsapp ?? null,
     whatsappUrl: buildWhatsAppUrl(

@@ -7,11 +7,10 @@ import { StoreProfileSkeleton } from "../components/store-profile-skeleton/store
 import { useStoreProfilePage } from "../hooks/use-store-profile-page";
 
 type StoreProfileViewProps = {
-  logoSrc?: string;
   onBack?: () => void;
 };
 
-export function StoreProfileView({ logoSrc, onBack }: StoreProfileViewProps) {
+export function StoreProfileView({ onBack }: StoreProfileViewProps) {
   const {
     store,
     profile,
@@ -78,7 +77,6 @@ export function StoreProfileView({ logoSrc, onBack }: StoreProfileViewProps) {
         <StoreProfileCard
           store={store}
           profile={profile}
-          logoSrc={logoSrc}
           whatsappLabel={whatsappLabel}
           whatsappUrl={whatsappUrl}
           mapsUrl={mapsUrl}

@@ -8,6 +8,7 @@ export function useCreateStore() {
   const [storeName, setStoreName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
   const [storeWhatsapp, setStoreWhatsapp] = useState("");
+  const [storeImageUrl, setStoreImageUrl] = useState("");
 
   async function handleCreateStore(): Promise<void> {
     const name = storeName.trim();
@@ -23,11 +24,13 @@ export function useCreateStore() {
         name,
         slug,
         whatsapp,
+        imageUrl: storeImageUrl.trim() || null,
       });
 
       setStoreName("");
       setStoreSlug("");
       setStoreWhatsapp("");
+      setStoreImageUrl("");
       setIsCreateDialogOpen(false);
     } catch {
       return;
@@ -47,11 +50,13 @@ export function useCreateStore() {
     storeName,
     storeSlug,
     storeWhatsapp,
+    storeImageUrl,
     createStoreError: createStoreMutation.error?.message ?? null,
     isCreatingStore: createStoreMutation.isPending,
     setStoreName,
     setStoreSlug,
     setStoreWhatsapp,
+    setStoreImageUrl,
     handleCreateStore,
     handleOpenCreateDialog,
     handleCloseCreateDialog,

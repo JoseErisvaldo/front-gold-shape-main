@@ -10,23 +10,25 @@ import { StorefrontHeader } from "../storefront-header/storefront-header";
 import { WhatsAppFab } from "../whatsapp-fab/whatsapp-fab";
 
 type StorefrontLayoutProps = {
-  logoSrc?: string;
   onHomeClick: () => void;
   onStoreClick: () => void;
   children: ReactNode;
 };
 
-export function StorefrontLayout({
-  children,
-  logoSrc,
-  onHomeClick,
-  onStoreClick,
-}: StorefrontLayoutProps) {
+export function StorefrontLayout({ children, onHomeClick, onStoreClick }: StorefrontLayoutProps) {
   const navigate = useNavigate();
   const session = useAuthStore((state) => state.session);
   const clearSession = useAuthStore((state) => state.clearSession);
-  const { storeName, isStoreLoading, whatsappUrl, itemsCount, isCartOpen, openCart, closeCart } =
-    useStorefrontLayout();
+  const {
+    storeName,
+    storeImageUrl,
+    isStoreLoading,
+    whatsappUrl,
+    itemsCount,
+    isCartOpen,
+    openCart,
+    closeCart,
+  } = useStorefrontLayout();
 
   useEffect(() => {
     if (session && sessionStorage.getItem("goldshape-storefront-checkout-step") === "delivery") {
@@ -52,8 +54,8 @@ export function StorefrontLayout({
     >
       <StorefrontHeader
         storeName={storeName}
+        storeImageUrl={storeImageUrl}
         isStoreLoading={isStoreLoading}
-        logoSrc={logoSrc}
         isAuthenticated={Boolean(session)}
         itemsCount={itemsCount}
         onHomeClick={onHomeClick}

@@ -17,7 +17,6 @@ import type { PublicProduct } from "../types/storefront.types";
 type StorefrontHomeViewProps = {
   onProductClick: (productId: string) => void;
   onStoreClick: () => void;
-  logoSrc?: string;
 };
 
 export function StorefrontHomeView({ onProductClick }: StorefrontHomeViewProps) {

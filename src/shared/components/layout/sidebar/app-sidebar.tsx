@@ -1,4 +1,6 @@
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import {
+  Avatar,
   Box,
   Divider,
   Drawer,
@@ -9,7 +11,6 @@ import {
   Typography,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import goldShapeLogo from "../../../../assets/goldshape-logo.png";
 import type { AppSidebarConfig, SidebarNavigationItem } from "./sidebar-config";
 
 type AppSidebarProps = {
@@ -64,6 +65,7 @@ function NavigationItems({
 
 function SidebarContents({
   brand,
+  brandImageUrl,
   sectionLabel,
   items,
   footerItems,
@@ -92,7 +94,14 @@ function SidebarContents({
           pl: 0.6,
         }}
       >
-        <img className="brand-mark" src={goldShapeLogo} alt="" width={44} height={44} />
+        <Avatar
+          src={brandImageUrl ?? undefined}
+          alt={`Logo da ${brand}`}
+          slotProps={{ img: { sx: { objectFit: "cover" } } }}
+          sx={{ width: 44, height: 44, bgcolor: "#DCFCE7", color: "#16A34A" }}
+        >
+          <StorefrontRoundedIcon />
+        </Avatar>
         <Typography
           component="span"
           sx={{

@@ -12,6 +12,7 @@ import { PaymentMethodsView } from "./modules/root/pages/features/payment-method
 import { ProductsListView } from "./modules/root/pages/features/products";
 import { CreateProductView } from "./modules/root/pages/features/products/views/create-product.view";
 import { StoresView } from "./modules/root/pages/features/store";
+import { useStoresQuery } from "./modules/root/pages/features/store/queries/use-stores-query";
 import { ProfileView } from "./modules/root/pages/features/users";
 import { CustomerOrdersView } from "./modules/root/pages/features-public/customer-orders";
 import { StoreProfileView } from "./modules/root/pages/features-public/store-profile";
@@ -50,9 +51,13 @@ function ProtectedHomeRoute() {
 
 function AuthenticatedLayout() {
   const clearSession = useAuthStore((state) => state.clearSession);
+  const { data: stores = [] } = useStoresQuery();
+  const store = stores[0];
 
   return (
     <AppLayout
+      storeName={store?.name ?? "Loja"}
+      storeImageUrl={store?.imageUrl ?? null}
       onLogout={() => {
         clearSession();
         queryClient.clear();

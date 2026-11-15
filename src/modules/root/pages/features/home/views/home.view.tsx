@@ -1,6 +1,12 @@
-import { Box, Paper, Typography } from "@mui/material";
-import goldShapeLogo from "../../../../../../assets/goldshape-logo.png";
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
+import { Avatar, Box, Paper, Typography } from "@mui/material";
+import { useStoresQuery } from "../../store/queries/use-stores-query";
+
 export function HomeView() {
+  const { data: stores = [] } = useStoresQuery();
+  const store = stores[0];
+  const storeName = store?.name ?? "Loja";
+
   return (
     <Box
       sx={{
@@ -28,7 +34,14 @@ export function HomeView() {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
-          <img className="brand-mark" src={goldShapeLogo} alt="" width={44} height={44} />
+          <Avatar
+            src={store?.imageUrl ?? undefined}
+            alt={`Logo da ${storeName}`}
+            slotProps={{ img: { sx: { objectFit: "cover" } } }}
+            sx={{ width: 44, height: 44, bgcolor: "#DCFCE7", color: "#16A34A" }}
+          >
+            <StorefrontRoundedIcon />
+          </Avatar>
           <Typography
             component="span"
             sx={{
@@ -38,7 +51,7 @@ export function HomeView() {
               fontWeight: 800,
             }}
           >
-            GoldShape
+            {storeName}
           </Typography>
         </Box>
         <Typography
@@ -64,7 +77,7 @@ export function HomeView() {
             letterSpacing: "-1.7px",
           }}
         >
-          Bem-vindo à GoldShape
+          Bem-vindo à {storeName}
         </Typography>
         <Typography
           component="p"

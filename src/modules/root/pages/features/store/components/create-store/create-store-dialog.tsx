@@ -14,11 +14,13 @@ type CreateStoreDialogProps = {
   storeName: string;
   storeSlug: string;
   storeWhatsapp: string;
+  storeImageUrl: string;
   error: string | null;
   isSubmitting: boolean;
   onStoreNameChange: (value: string) => void;
   onStoreSlugChange: (value: string) => void;
   onStoreWhatsappChange: (value: string) => void;
+  onStoreImageUrlChange: (value: string) => void;
   onClose: () => void;
   onSubmit: () => void;
 };
@@ -28,11 +30,13 @@ export function CreateStoreDialog({
   storeName,
   storeSlug,
   storeWhatsapp,
+  storeImageUrl,
   error,
   isSubmitting,
   onStoreNameChange,
   onStoreSlugChange,
   onStoreWhatsappChange,
+  onStoreImageUrlChange,
   onClose,
   onSubmit,
 }: CreateStoreDialogProps) {
@@ -88,6 +92,17 @@ export function CreateStoreDialog({
           value={storeWhatsapp}
           onChange={(event) => onStoreWhatsappChange(event.target.value)}
           helperText="Informe o número com código do país e DDD."
+          sx={{ mt: 2 }}
+        />
+
+        <TextField
+          fullWidth
+          type="url"
+          label="URL da imagem da loja"
+          placeholder="https://exemplo.com/logo.png"
+          value={storeImageUrl}
+          onChange={(event) => onStoreImageUrlChange(event.target.value)}
+          helperText="Opcional. Informe um link público para a imagem."
           sx={{ mt: 2 }}
         />
 

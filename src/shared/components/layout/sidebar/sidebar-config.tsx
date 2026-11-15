@@ -19,14 +19,15 @@ export type SidebarNavigationItem = {
 
 export type AppSidebarConfig = {
   brand: string;
+  brandImageUrl?: string | null;
   sectionLabel?: string;
   items: SidebarNavigationItem[];
   footerLabel?: string;
   footerItems?: SidebarNavigationItem[];
 };
 
-export const GoldShape_SIDEBAR_CONFIG: AppSidebarConfig = {
-  brand: "GoldShape",
+export const APP_SIDEBAR_CONFIG: AppSidebarConfig = {
+  brand: "Loja",
   sectionLabel: "ESPAÇO DE TRABALHO",
   items: [
     {
