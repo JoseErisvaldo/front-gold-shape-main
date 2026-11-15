@@ -20,6 +20,7 @@ import { useCreateCategoryMutation } from "../../mutations/use-create-category-m
 const createCategorySchema = z.object({
   name: z.string().trim().min(1, "Informe o nome da categoria."),
   description: z.string().trim().optional(),
+  imageUrl: z.union([z.literal(""), z.string().url("Informe uma URL válida.")]),
 });
 
 type CreateCategoryFormData = z.infer<typeof createCategorySchema>;
@@ -43,6 +44,7 @@ export function CreateCategoryDialog({ open, onClose, onCreated }: CreateCategor
     defaultValues: {
       name: "",
       description: "",
+      imageUrl: "",
     },
   });
 
@@ -51,6 +53,7 @@ export function CreateCategoryDialog({ open, onClose, onCreated }: CreateCategor
       reset({
         name: "",
         description: "",
+        imageUrl: "",
       });
     }
   }, [open, reset]);
@@ -76,6 +79,7 @@ export function CreateCategoryDialog({ open, onClose, onCreated }: CreateCategor
         name: values.name.trim(),
         slug,
         description: values.description?.trim() || undefined,
+        imageUrl: values.imageUrl.trim() || undefined,
       });
 
       toast.success("Categoria criada com sucesso!");
@@ -146,6 +150,22 @@ export function CreateCategoryDialog({ open, onClose, onCreated }: CreateCategor
                   minRows={3}
                   error={Boolean(errors.description)}
                   helperText={errors.description?.message}
+                  disabled={isLoading}
+                />
+              )}
+            />
+
+            <Controller
+              name="imageUrl"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Imagem da categoria (URL)"
+                  placeholder="https://..."
+                  fullWidth
+                  error={Boolean(errors.imageUrl)}
+                  helperText={errors.imageUrl?.message ?? "Opcional. A imagem aparece na vitrine."}
                   disabled={isLoading}
                 />
               )}

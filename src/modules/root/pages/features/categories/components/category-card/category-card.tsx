@@ -38,6 +38,23 @@ export function CategoryCard({
         bgcolor: "#FFFFFF",
       }}
     >
+      {category.imageUrl && (
+        <Box
+          component="img"
+          src={category.imageUrl}
+          alt=""
+          loading="lazy"
+          sx={{
+            display: "block",
+            width: "100%",
+            height: 112,
+            mb: 1.5,
+            borderRadius: 1.5,
+            objectFit: "cover",
+            bgcolor: "#F1F5F2",
+          }}
+        />
+      )}
       <Box sx={{ minWidth: 0 }}>
         <Box
           sx={{

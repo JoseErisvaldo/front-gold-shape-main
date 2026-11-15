@@ -5,6 +5,7 @@ export const categorySchema = z.object({
   name: z.string(),
   slug: z.string(),
   description: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
   active: z.boolean(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
@@ -16,4 +17,5 @@ export const createCategorySchema = z.object({
   name: z.string().trim().min(1, "Informe o nome da categoria."),
   slug: z.string().trim().min(1, "Informe o slug da categoria."),
   description: z.string().trim().optional(),
+  imageUrl: z.string().url("Informe uma URL válida.").optional(),
 });

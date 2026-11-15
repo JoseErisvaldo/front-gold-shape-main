@@ -2,6 +2,7 @@ import LocalOfferRoundedIcon from "@mui/icons-material/LocalOfferRounded";
 import { Box } from "@mui/material";
 import type { PublicProduct, PublicVariant } from "../../types/storefront.types";
 import { ProductCard } from "../product-card/product-card";
+import { ProductsGrid } from "../products-grid/products-grid";
 import { SectionHeading } from "../section-heading/section-heading";
 
 type OffersRailProps = {
@@ -15,36 +16,23 @@ export function OffersRail({ products, onProductClick, onQuickAdd, onSeeAll }: O
   return (
     <Box component="section" aria-label="Ofertas">
       <SectionHeading
-        title="Ofertas"
-        subtitle="Produtos com desconto para aproveitar agora"
+        title="Ofertas do dia"
+        subtitle="Produtos com desconto para aproveitar agora."
         icon={<LocalOfferRoundedIcon fontSize="small" />}
         actionLabel="Ver todas"
         onActionClick={onSeeAll}
       />
 
-      <Box
-        sx={{
-          display: "flex",
-          gap: { xs: 1.5, sm: 2.5 },
-          overflowX: "auto",
-          mx: { xs: -2, sm: 0 },
-          px: { xs: 2, sm: 0 },
-          pb: 1,
-          scrollSnapType: "x proximity",
-        }}
-      >
+      <ProductsGrid>
         {products.map((product) => (
-          <Box
+          <ProductCard
             key={product.id}
-            sx={{
-              flex: { xs: "0 0 168px", sm: "0 0 220px", lg: "0 0 240px" },
-              scrollSnapAlign: "start",
-            }}
-          >
-            <ProductCard product={product} onClick={onProductClick} onQuickAdd={onQuickAdd} />
-          </Box>
+            product={product}
+            onClick={onProductClick}
+            onQuickAdd={onQuickAdd}
+          />
         ))}
-      </Box>
+      </ProductsGrid>
     </Box>
   );
 }

@@ -14,6 +14,7 @@ type StorefrontFooterProps = {
 
 export function StorefrontFooter({ storeName, whatsappUrl }: StorefrontFooterProps) {
   const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
+  const displayName = storeName || "Loja";
 
   return (
     <Box component="footer" sx={{ mt: 6, borderTop: "1px solid #DFE2EC", bgcolor: "#FFFFFF" }}>
@@ -34,11 +35,10 @@ export function StorefrontFooter({ storeName, whatsappUrl }: StorefrontFooterPro
       >
         <Box>
           <Typography sx={{ color: "#1D2A22", fontSize: 16, fontWeight: 800 }}>
-            {storeName}
+            {displayName}
           </Typography>
           <Typography sx={{ mt: 0.5, color: "#858A9D", fontSize: 13, lineHeight: 1.6 }}>
-            Sua loja de suplementos em Louveira, com produtos selecionados para apoiar sua saúde,
-            bem-estar e desempenho.
+            Confira produtos, ofertas e informações da loja em um só lugar.
           </Typography>
         </Box>
 
@@ -122,7 +122,7 @@ export function StorefrontFooter({ storeName, whatsappUrl }: StorefrontFooterPro
             target="_blank"
             rel="noopener noreferrer"
             startIcon={<InstagramIcon />}
-            aria-label={`Instagram de ${storeName}`}
+            aria-label={`Instagram de ${displayName}`}
             sx={{
               minHeight: 40,
               px: 1.5,
@@ -151,7 +151,7 @@ export function StorefrontFooter({ storeName, whatsappUrl }: StorefrontFooterPro
           textAlign: "center",
         }}
       >
-        © {new Date().getFullYear()} {storeName}. Todos os direitos reservados.
+        © {new Date().getFullYear()} {displayName}. Todos os direitos reservados.
       </Typography>
       <PaymentMethodsDrawer
         open={isPaymentDrawerOpen}

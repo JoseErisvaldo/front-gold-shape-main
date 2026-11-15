@@ -4,6 +4,7 @@ import { Alert, Box, Button, Stack } from "@mui/material";
 import { CatalogEmptyState } from "../components/catalog-empty-state/catalog-empty-state";
 import { CatalogToolbar } from "../components/catalog-toolbar/catalog-toolbar";
 import { CategoryChips } from "../components/category-chips/category-chips";
+import { FeaturedProductsRail } from "../components/featured-products-rail/featured-products-rail";
 import { HeroBanner } from "../components/hero-banner/hero-banner";
 import { OffersRail } from "../components/offers-rail/offers-rail";
 import { ProductCard } from "../components/product-card/product-card";
@@ -22,9 +23,9 @@ type StorefrontHomeViewProps = {
 export function StorefrontHomeView({ onProductClick }: StorefrontHomeViewProps) {
   const {
     storeName,
+    storeImageUrl,
     whatsappUrl,
     featuredProducts,
-    isFeaturedLoading,
     offers,
     categories,
     isCategoriesLoading,
@@ -62,13 +63,25 @@ export function StorefrontHomeView({ onProductClick }: StorefrontHomeViewProps) 
   return (
     <Stack spacing={{ xs: 3, md: 5 }}>
       <HeroBanner
-        products={featuredProducts}
-        isLoading={isFeaturedLoading}
+        products={[]}
+        isLoading={false}
         storeName={storeName}
+        storeImageUrl={storeImageUrl}
         whatsappUrl={whatsappUrl}
         onProductClick={handleProductClick}
         onQuickAdd={addToCart}
         onBrowseClick={browseCatalog}
+      />
+
+      <CatalogToolbar
+        search={searchInput}
+        onSearchChange={setSearchInput}
+        onlyOnSale={onlyOnSale}
+        onOnlyOnSaleChange={setOnlyOnSale}
+        sort={sort}
+        onSortChange={setSort}
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={clearFilters}
       />
 
       <CategoryChips
@@ -76,6 +89,13 @@ export function StorefrontHomeView({ onProductClick }: StorefrontHomeViewProps) 
         selectedId={categoryId}
         isLoading={isCategoriesLoading}
         onSelect={setCategoryId}
+      />
+
+      <FeaturedProductsRail
+        products={featuredProducts}
+        onProductClick={handleProductClick}
+        onQuickAdd={addToCart}
+        onSeeAll={browseCatalog}
       />
 
       {showOffers && (
@@ -88,17 +108,10 @@ export function StorefrontHomeView({ onProductClick }: StorefrontHomeViewProps) 
       )}
 
       <Box id={CATALOG_SECTION_ID} component="section" sx={{ scrollMarginTop: 88 }}>
-        <SectionHeading title={catalogTitle} icon={<StorefrontRoundedIcon fontSize="small" />} />
-
-        <CatalogToolbar
-          search={searchInput}
-          onSearchChange={setSearchInput}
-          onlyOnSale={onlyOnSale}
-          onOnlyOnSaleChange={setOnlyOnSale}
-          sort={sort}
-          onSortChange={setSort}
-          hasActiveFilters={hasActiveFilters}
-          onClearFilters={clearFilters}
+        <SectionHeading
+          title={catalogTitle}
+          subtitle="Novidades e produtos escolhidos para você."
+          icon={<StorefrontRoundedIcon fontSize="small" />}
         />
 
         {isError && (

@@ -16,6 +16,7 @@ export const publicCategorySchema = z.object({
   name: z.string(),
   slug: z.string().optional(),
   description: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
   active: z.boolean().optional(),
 });
 

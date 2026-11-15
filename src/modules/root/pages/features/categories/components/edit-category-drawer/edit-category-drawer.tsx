@@ -13,6 +13,7 @@ const editCategoryFormSchema = z.object({
   name: z.string().trim().min(1, "Informe o nome da categoria."),
   slug: z.string().trim().min(1, "Informe o slug da categoria."),
   description: z.string().optional(),
+  imageUrl: z.union([z.literal(""), z.string().url("Informe uma URL válida.")]),
 });
 
 type EditCategoryFormValues = z.infer<typeof editCategoryFormSchema>;
@@ -55,6 +56,7 @@ export function EditCategoryDrawer({
       name: "",
       slug: "",
       description: "",
+      imageUrl: "",
     },
   });
 
@@ -67,6 +69,7 @@ export function EditCategoryDrawer({
       name: category.name,
       slug: category.slug,
       description: category.description ?? "",
+      imageUrl: category.imageUrl ?? "",
     });
   }, [category, open, reset]);
 
@@ -85,6 +88,7 @@ export function EditCategoryDrawer({
         name: values.name.trim(),
         slug: generateSlug(values.name),
         description: values.description?.trim() ?? "",
+        imageUrl: values.imageUrl.trim() || null,
       },
     });
 
@@ -174,6 +178,17 @@ export function EditCategoryDrawer({
             minRows={4}
             error={Boolean(errors.description)}
             helperText={errors.description?.message}
+          />
+
+          <TextField
+            {...register("imageUrl")}
+            label="Imagem da categoria (URL)"
+            placeholder="https://..."
+            fullWidth
+            error={Boolean(errors.imageUrl)}
+            helperText={
+              errors.imageUrl?.message ?? "Opcional. Limpe o campo para remover a imagem."
+            }
           />
         </Box>
 

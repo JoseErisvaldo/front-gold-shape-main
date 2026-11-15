@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { storefrontQueryKeys } from "../../../features-public/storefront/endpoints-keys/storefront.keys";
 import { categoryQueryKeys } from "../endpoints-keys/category.keys";
 import { createCategoryService } from "../services/create-category.service";
 
@@ -10,6 +11,9 @@ export function useCreateCategoryMutation() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: categoryQueryKeys.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: storefrontQueryKeys.categories(),
       });
     },
   });

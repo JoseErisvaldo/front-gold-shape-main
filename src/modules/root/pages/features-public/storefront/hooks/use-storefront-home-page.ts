@@ -59,8 +59,8 @@ export function useStorefrontHomePage() {
   const catalogTitle = debouncedSearch
     ? `Resultados para “${debouncedSearch}”`
     : onlyOnSale
-      ? "Ofertas"
-      : (selectedCategory?.name ?? "Todos os produtos");
+      ? "Ofertas do dia"
+      : (selectedCategory?.name ?? "Descobertas do dia");
 
   const clearFilters = () => {
     setSearchInput("");
@@ -85,6 +85,7 @@ export function useStorefrontHomePage() {
 
   return {
     storeName: storeQuery.data?.name ?? "",
+    storeImageUrl: storeQuery.data?.imageUrl ?? null,
     whatsappUrl: buildWhatsAppUrl(storeQuery.data?.whatsapp),
 
     featuredProducts: featuredQuery.data ?? [],

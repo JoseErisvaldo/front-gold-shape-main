@@ -1,6 +1,7 @@
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Box, Button, Chip, IconButton, Skeleton, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
@@ -17,6 +18,7 @@ type HeroBannerProps = {
   products: PublicProduct[];
   isLoading: boolean;
   storeName: string;
+  storeImageUrl: string | null;
   whatsappUrl: string | null;
   onProductClick: (product: PublicProduct) => void;
   onQuickAdd: (product: PublicProduct, variant: PublicVariant) => void;
@@ -78,6 +80,7 @@ export function HeroBanner({
   products,
   isLoading,
   storeName,
+  storeImageUrl,
   whatsappUrl,
   onProductClick,
   onQuickAdd,
@@ -163,9 +166,17 @@ export function HeroBanner({
       <Box
         component="section"
         aria-label="Boas-vindas"
-        sx={{ ...heroSx, p: { xs: 3, sm: 5, md: 7 } }}
+        sx={{
+          ...heroSx,
+          minHeight: { xs: 240, sm: 260 },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 3,
+          p: { xs: 3, sm: 4, md: 5 },
+        }}
       >
-        <Box sx={{ maxWidth: 560 }}>
+        <Box sx={{ maxWidth: 640, position: "relative", zIndex: 1 }}>
           <Typography
             sx={{
               color: "#CFE89A",
@@ -191,12 +202,12 @@ export function HeroBanner({
           </Typography>
 
           <Typography sx={{ mt: 1.5, color: "#B3C2B6", fontSize: 15, lineHeight: 1.7 }}>
-            Escolha seus produtos, monte o carrinho e finalize o pedido pelo WhatsApp.
+            Encontre seus produtos favoritos, monte o carrinho e finalize seu pedido online.
           </Typography>
 
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 3 }}>
             <Button disableElevation onClick={onBrowseClick} sx={primaryButtonSx}>
-              Ver produtos
+              Explorar produtos
             </Button>
 
             {whatsappUrl && (
@@ -212,6 +223,32 @@ export function HeroBanner({
               </Button>
             )}
           </Box>
+        </Box>
+        <Box
+          aria-hidden="true"
+          sx={{
+            width: { xs: 100, sm: 148, md: 184 },
+            height: { xs: 100, sm: 148, md: 184 },
+            flexShrink: 0,
+            display: { xs: "none", sm: "grid" },
+            placeItems: "center",
+            overflow: "hidden",
+            border: "8px solid rgba(255,255,255,.14)",
+            borderRadius: "50%",
+            bgcolor: "rgba(255,255,255,.95)",
+            boxShadow: "0 20px 50px rgba(0,0,0,.2)",
+          }}
+        >
+          {storeImageUrl ? (
+            <Box
+              component="img"
+              src={storeImageUrl}
+              alt=""
+              sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <StorefrontRoundedIcon sx={{ color: "#16A34A", fontSize: { xs: 48, md: 80 } }} />
+          )}
         </Box>
       </Box>
     );

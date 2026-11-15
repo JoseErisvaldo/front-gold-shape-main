@@ -5,6 +5,7 @@ export const updateCategorySchema = z
     name: z.string().trim().min(1, "Informe o nome da categoria.").optional(),
     slug: z.string().trim().min(1, "Informe o slug da categoria.").optional(),
     description: z.string().trim().optional(),
+    imageUrl: z.string().url("Informe uma URL válida.").nullable().optional(),
     active: z.boolean().optional(),
   })
   .refine(
@@ -12,6 +13,7 @@ export const updateCategorySchema = z
       data.name !== undefined ||
       data.slug !== undefined ||
       data.description !== undefined ||
+      data.imageUrl !== undefined ||
       data.active !== undefined,
     { message: "Informe pelo menos um campo para atualizar." },
   );
